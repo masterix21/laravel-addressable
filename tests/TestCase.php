@@ -2,8 +2,8 @@
 
 namespace Masterix21\Addressable\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
 use Masterix21\Addressable\AddressableServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
