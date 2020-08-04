@@ -32,8 +32,43 @@ php artisan vendor:publish --provider="Masterix21\Addressable\AddressableService
 
 ## Usage
 
+Extends an Eloquent model to supports the addresses is simple.
 ``` php
-@TODO
+use Masterix21\Addressable\Models\Concerns\HasAddresses;
+
+class User extends Model {
+    use HasAddresses;
+}
+
+$user->shipments(); // morphMany of `Masterix21\Addressable\Models\Address` 
+```
+
+`HasAddress` is a generic trait that will implements all addresses code, but if you like to handle the shipments addresses or the billing address there are other two traits.
+
+```php
+use Masterix21\Addressable\Models\Concerns\HasBillingAddresses;
+use Masterix21\Addressable\Models\Concerns\HasShippingAddresses;
+
+class User extends Model {
+    use HasBillingAddresses, 
+        HasShippingAddresses;
+}
+
+$user->billingAddress(); // Primary billing address
+$user->billingAddresses(); // All billing addresses
+
+$user->shipmentAddress(); // Primary shipment address
+$user->shipmentAddresses(); // All shipment addresses
+```
+
+### Mark and unmark an address as primary
+To be sure that only one address per type will be "primary", you can use the `markPrimary()` method. It will mark the address as primary and will unmark the others (of the same type).
+```php
+$shipmentAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked` and `ShipmentAddressPrimaryMarked`
+$shipmentAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `ShipmentAddressPrimaryUnmarked`
+
+$billingAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked` and `BillingAddressPrimaryMarked`
+$billingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `BillingAddressPrimaryUnmarked`
 ```
 
 ## Testing
@@ -41,6 +76,9 @@ php artisan vendor:publish --provider="Masterix21\Addressable\AddressableService
 ``` bash
 composer test
 ```
+
+## Todo
+- [ ] Method to retrieve all nearby addresses of X kilometers
 
 ## Changelog
 

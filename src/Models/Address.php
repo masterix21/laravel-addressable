@@ -12,15 +12,25 @@ class Address extends Model
         'is_primary',
         'is_billing',
         'is_shipping',
-        'address1',
-        'address2',
-        'address3',
-        'postal_code',
+        'address',
+        'secondary_address',
+        'street_address',
+        'street_name',
+        'street_suffix',
+        'building_number',
         'city',
-        'province',
-        'region',
-        'country_code',
+        'city_prefix',
+        'city_suffix',
+        'postcode',
+        'state',
+        'state_abbr',
+        'country',
+        'country_abbr',
         'latitude',
         'longitude',
+    ];
+
+    protected $guarded = [
+        'is_primary',
     ];
 }
