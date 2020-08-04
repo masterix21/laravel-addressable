@@ -2,7 +2,6 @@
 
 namespace Masterix21\Addressable\Models\Concerns;
 
-
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryMarked;
