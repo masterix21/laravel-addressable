@@ -3,6 +3,7 @@
 namespace Masterix21\Addressable\Models\Concerns;
 
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
+use Masterix21\Addressable\Events\AddressPrimaryMarked;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryMarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryUnmarked;
@@ -31,7 +32,7 @@ trait ImplementsMarkPrimary
             event(new BillingAddressPrimaryMarked($this));
         }
 
-        if ($this->is_shipment) {
+        if ($this->is_shipping) {
             event(new ShipmentAddressPrimaryMarked($this));
         }
     }
@@ -47,7 +48,7 @@ trait ImplementsMarkPrimary
             event(new BillingAddressPrimaryUnmarked($this));
         }
 
-        if ($this->is_shipment) {
+        if ($this->is_shipping) {
             event(new ShipmentAddressPrimaryUnmarked($this));
         }
     }

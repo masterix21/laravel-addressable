@@ -15,19 +15,19 @@ class CreateAddressableTable extends Migration
             $table->id();
 
             $table->morphs('addressable');
+            $table->string('label')->nullable();
             $table->boolean('is_primary')->default(false);
             $table->boolean('is_billing')->default(false);
             $table->boolean('is_shipping')->default(false);
-            $table->string('address1')->nullable();
-            $table->string('address2')->nullable();
-            $table->string('address3')->nullable();
-            $table->string('postal_code')->nullable();
+            $table->string('street_address1')->nullable();
+            $table->string('street_address2')->nullable();
+            $table->string('zip')->nullable();
             $table->string('city')->nullable();
-            $table->string('province')->nullable();
-            $table->string('region')->nullable();
+            $table->string('state')->nullable();
+            $table->string('country')->nullable();
             $table->string('country_code', 2)->nullable();
-            $this->decimal('latitude', 10, 7)->nullable();
-            $this->decimal('longitude', 10, 7)->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
 
             $table->timestamps();
         });

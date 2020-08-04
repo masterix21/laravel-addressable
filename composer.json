@@ -48,7 +48,7 @@
         "laravel": {
             "providers": [
                 "AddressableServiceProvider"
-            ],
+            ]
         }
     },
     "minimum-stability": "dev",
