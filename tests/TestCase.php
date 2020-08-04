@@ -2,8 +2,8 @@
 
 namespace Masterix21\LaravelAddressable\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
 use Masterix21\LaravelAddressable\LaravelAddressableServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
