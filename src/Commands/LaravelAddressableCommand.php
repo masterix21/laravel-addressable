@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\Skeleton\Commands;
+namespace Masterix21\LaravelAddressable\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelAddressableCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-addressable';
 
     public $description = 'My command';
 
