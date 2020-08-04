@@ -1,54 +1,39 @@
 # Addresses for any Eloquent model
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-addressable)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-addressable/run-tests?label=tests)](https://github.com/spatie/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster)
-[![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-addressable)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-addressable)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/masterix21/laravel-addressable/run-tests?label=tests)](https://github.com/spatie/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![Total Downloads](https://img.shields.io/packagist/dt/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-addressable)
 
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+This package adds to any Eloquent model the addresses: in this way will be easier to support a billing address, the shipment addresses or others. 
 
 ## Support us
 
-Learn how to create a package like this one, by watching our premium video course:
-
-[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+If you like my work, you can [sponsoring me](https://github.com/masterix21).
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require spatie/package-laravel-addressable-laravel
+composer require masterix21/laravel-addressable
 ```
 
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --provider="Masterix21\LaravelAddressable\LaravelAddressableServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Masterix21\LaravelAddressable\LaravelAddressableServiceProvider" --tag="config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
+php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="config"
 ```
 
 ## Usage
 
 ``` php
-$laravel-addressable = new Masterix21\LaravelAddressable();
-echo $laravel-addressable->echoPhrase('Hello, Masterix21!');
+@TODO
 ```
 
 ## Testing

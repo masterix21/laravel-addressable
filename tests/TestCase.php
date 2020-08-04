@@ -1,9 +1,9 @@
 <?php
 
-namespace Masterix21\LaravelAddressable\Tests;
+namespace Masterix21\Addressable\Tests;
 
-use Masterix21\LaravelAddressable\LaravelAddressableServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Masterix21\Addressable\AddressableServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -17,7 +17,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            LaravelAddressableServiceProvider::class,
+            AddressableServiceProvider::class,
         ];
     }
 

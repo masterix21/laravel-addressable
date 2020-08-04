@@ -1,8 +1,8 @@
 {
-    "name": "spatie/laravel-addressable",
+    "name": "masterix21/laravel-addressable",
     "description": "Addresses for any Eloquent model",
     "keywords": [
-        "spatie",
+        "masterix21",
         "laravel-addressable"
     ],
     "homepage": "https://github.com/spatie/laravel-addressable",
@@ -11,7 +11,7 @@
         {
             "name": "Luca Longo",
             "email": "l.longo@ambita.it",
-            "homepage": "https://spatie.be",
+            "homepage": "https://masterix.org",
             "role": "Developer"
         }
     ],
@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Masterix21\\LaravelAddressable\\": "src"
+            "Masterix21\\Addressable\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Masterix21\\LaravelAddressable\\Tests\\": "tests"
+            "Masterix21\\Addressable\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -47,11 +47,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Masterix21\\LaravelAddressable\\LaravelAddressableServiceProvider"
+                "AddressableServiceProvider"
             ],
-            "aliases": {
-                "LaravelAddressable": "Masterix21\\LaravelAddressable\\LaravelAddressableFacade"
-            }
         }
     },
     "minimum-stability": "dev",
