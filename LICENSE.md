@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) Masterix21 bvba <info@spatie.be>
+Copyright (c) Luca Longo <l.longo@ambita.it>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
