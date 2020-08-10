@@ -9,6 +9,11 @@ class CreateAddressableTable extends Migration
 {
     use UsesAddressableConfig;
 
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create($this->addressesDatabaseTable(), function (Blueprint $table) {
@@ -31,5 +36,15 @@ class CreateAddressableTable extends Migration
 
             $table->timestamps();
         });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists($this->addressesDatabaseTable());
     }
 }

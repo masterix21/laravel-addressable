@@ -26,4 +26,10 @@ class Address extends Model
         'latitude',
         'longitude',
     ];
+
+    protected $casts = [
+        'is_primary' => 'bool',
+        'is_billing' => 'bool',
+        'is_shipping' => 'bool',
+    ];
 }

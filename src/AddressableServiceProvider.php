@@ -13,7 +13,7 @@ class AddressableServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/addressable.php' => config_path('addressable.php'),
             ], 'config');
 
-            if (! class_exists('CreatePackageTable')) {
+            if (! class_exists('CreateAddressableTable')) {
                 $this->publishes([
                     __DIR__ . '/../database/migrations/create_addressable_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_addressable_table.php'),
                 ], 'migrations');
