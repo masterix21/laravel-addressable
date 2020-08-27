@@ -7,8 +7,8 @@ use Masterix21\Addressable\Events\AddressPrimaryMarked;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryMarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryUnmarked;
-use Masterix21\Addressable\Events\ShipmentAddressPrimaryMarked;
-use Masterix21\Addressable\Events\ShipmentAddressPrimaryUnmarked;
+use Masterix21\Addressable\Events\ShippingAddressPrimaryMarked;
+use Masterix21\Addressable\Events\ShippingAddressPrimaryUnmarked;
 use Masterix21\Addressable\Models\Address;
 use Masterix21\Addressable\Tests\TestCase;
 use Masterix21\Addressable\Tests\TestClasses\User;
@@ -121,7 +121,7 @@ class AddressTest extends TestCase
         $user->shippingAddresses->first()->markPrimary();
 
         Event::assertDispatched(AddressPrimaryMarked::class);
-        Event::assertDispatched(ShipmentAddressPrimaryMarked::class);
+        Event::assertDispatched(ShippingAddressPrimaryMarked::class);
     }
 
     /** @test */
@@ -141,6 +141,6 @@ class AddressTest extends TestCase
         $user->shippingAddress->unmarkPrimary();
 
         Event::assertDispatched(AddressPrimaryUnmarked::class);
-        Event::assertDispatched(ShipmentAddressPrimaryUnmarked::class);
+        Event::assertDispatched(ShippingAddressPrimaryUnmarked::class);
     }
 }

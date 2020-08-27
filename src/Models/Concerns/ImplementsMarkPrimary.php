@@ -7,8 +7,8 @@ use Masterix21\Addressable\Events\AddressPrimaryMarked;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryMarked;
 use Masterix21\Addressable\Events\BillingAddressPrimaryUnmarked;
-use Masterix21\Addressable\Events\ShipmentAddressPrimaryMarked;
-use Masterix21\Addressable\Events\ShipmentAddressPrimaryUnmarked;
+use Masterix21\Addressable\Events\ShippingAddressPrimaryMarked;
+use Masterix21\Addressable\Events\ShippingAddressPrimaryUnmarked;
 
 trait ImplementsMarkPrimary
 {
@@ -22,7 +22,7 @@ trait ImplementsMarkPrimary
         $this->addressModel()::query()
             ->where('is_primary', true)
             ->where('is_billing', $this->is_billing)
-            ->where('is_shipment', $this->is_shipment)
+            ->where('is_shipping', $this->is_shipment)
             ->where('id', '!=', $this->id)
             ->update([ 'is_primary' => false ]);
 
@@ -33,7 +33,7 @@ trait ImplementsMarkPrimary
         }
 
         if ($this->is_shipping) {
-            event(new ShipmentAddressPrimaryMarked($this));
+            event(new ShippingAddressPrimaryMarked($this));
         }
     }
 
@@ -49,7 +49,7 @@ trait ImplementsMarkPrimary
         }
 
         if ($this->is_shipping) {
-            event(new ShipmentAddressPrimaryUnmarked($this));
+            event(new ShippingAddressPrimaryUnmarked($this));
         }
     }
 }

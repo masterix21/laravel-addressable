@@ -4,7 +4,7 @@ namespace Masterix21\Addressable\Events;
 
 use Masterix21\Addressable\Models\Address;
 
-class ShipmentAddressPrimaryMarked
+class ShippingAddressPrimaryMarked
 {
     public Address $address;
 
