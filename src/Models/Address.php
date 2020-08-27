@@ -27,9 +27,31 @@ class Address extends Model
         'longitude',
     ];
 
+    protected $appends = [
+        'display_address',
+    ];
+
     protected $casts = [
         'is_primary' => 'bool',
         'is_billing' => 'bool',
         'is_shipping' => 'bool',
     ];
+
+    public function getDisplayAddressAttribute() : string
+    {
+        $keys = [
+            'street_address1',
+            'street_address2',
+            'zip',
+            'city',
+            'state',
+            'country',
+            'country_code',
+        ];
+
+        return collect($this->getAttributes())
+            ->filter(fn ($item, $key) => in_array($key, $keys) && ! blank($item))
+            ->values()
+            ->join(' - ');
+    }
 }
