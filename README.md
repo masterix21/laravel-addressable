@@ -58,15 +58,15 @@ class User extends Model {
 $user->billingAddress(); // Primary billing address
 $user->billingAddresses(); // All billing addresses
 
-$user->shipmentAddress(); // Primary shipment address
-$user->shipmentAddresses(); // All shipment addresses
+$user->shippingAddress(); // Primary shipment address
+$user->shippingAddresses(); // All shipment addresses
 ```
 
 ### Mark and unmark an address as primary
 To be sure that only one address per type will be "primary", you can use the `markPrimary()` method. It will mark the address as primary and will unmark the others (of the same type).
 ```php
-$shipmentAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked` and `ShippingAddressPrimaryMarked`
-$shipmentAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `ShippingAddressPrimaryUnmarked`
+$shippingAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked` and `ShippingAddressPrimaryMarked`
+$shippingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `ShippingAddressPrimaryUnmarked`
 
 $billingAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked` and `BillingAddressPrimaryMarked`
 $billingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `BillingAddressPrimaryUnmarked`
