@@ -2,12 +2,13 @@
 
 namespace Masterix21\Addressable\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Masterix21\Addressable\Models\Concerns\ImplementsMarkPrimary;
 
 class Address extends Model
 {
-    use ImplementsMarkPrimary;
+    use ImplementsMarkPrimary, HasFactory;
 
     protected $fillable = [
         'addressable_type',
