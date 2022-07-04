@@ -11,10 +11,10 @@ class GeoExpression extends Expression
     public function getValue()
     {
         if ($this->hasSrid()) {
-            return "ST_GeomFromText(?, ?, 'axis-order=long-lat')";
+            return "ST_GeomFromText(?, ?)";
         }
 
-        return "ST_GeomFromText(?, 'axis-order=long-lat')";
+        return "ST_GeomFromText(?)";
     }
 
     public function getGeoValue(): string

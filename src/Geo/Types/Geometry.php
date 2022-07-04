@@ -29,9 +29,9 @@ abstract class Geometry implements Arrayable, Stringable
         return $parsed;
     }
 
-    public function getSrid(): ?int
+    public function getSrid(): int
     {
-        return $this->srid;
+        return $this->srid ?? config('addressable.srid');
     }
 
     public function setSrid(int $value): self

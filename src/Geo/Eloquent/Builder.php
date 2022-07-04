@@ -8,7 +8,7 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
 {
     public function update(array $values): int
     {
-        foreach ($values as $key => &$value) {
+        foreach ($values as &$value) {
             if ($value instanceof Geometry) {
                 $value = $this->asWKT($value);
             }

@@ -3,12 +3,15 @@
 namespace Masterix21\Addressable\Geo\Eloquent;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Masterix21\Addressable\Geo\Eloquent\Concerns\ImplementsQueryScopes;
 use Masterix21\Addressable\Geo\Types\Geometry;
 use Masterix21\Addressable\Models\Address;
 
 /** @mixin Address */
 trait ImplementsGeoAttributes
 {
+    use ImplementsQueryScopes;
+
     protected function newBaseQueryBuilder(): QueryBuilder
     {
         $connection = $this->getConnection();

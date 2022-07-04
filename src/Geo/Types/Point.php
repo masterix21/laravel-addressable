@@ -5,18 +5,11 @@ namespace Masterix21\Addressable\Geo\Types;
 class Point extends Geometry
 {
     public function __construct(
-        protected ?float $longitude = null,
         protected ?float $latitude = null,
+        protected ?float $longitude = null,
         protected ?int $srid = null
     ) {
         // ...
-    }
-
-    public function setLongitude(?float $value): self
-    {
-        $this->longitude = $value;
-
-        return $this;
     }
 
     public function setLatitude(?float $value): self
@@ -26,14 +19,21 @@ class Point extends Geometry
         return $this;
     }
 
-    public function getLongitude(): ?float
+    public function setLongitude(?float $value): self
     {
-        return $this->longitude;
+        $this->longitude = $value;
+
+        return $this;
     }
 
     public function getLatitude(): ?float
     {
         return $this->latitude;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
     }
 
     public function toWKT(): string
@@ -44,14 +44,14 @@ class Point extends Geometry
     public function toArray(): array
     {
         return [
-            'longitude' => $this->longitude,
             'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'srid' => $this->srid,
         ];
     }
 
     public function __toString(): string
     {
-        return $this->longitude .' '. $this->latitude;
+        return $this->latitude .' '. $this->longitude;
     }
 }
