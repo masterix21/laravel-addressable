@@ -10,7 +10,15 @@ use Masterix21\Addressable\Models\Address;
 /** @mixin Address */
 trait ImplementsQueryScopes
 {
-    public function scopeWithPositionDistance(Builder $builder, Point $position, ?float $meters = null, string $condition = '<='): Builder
+    /**
+     * @param Builder           $builder
+     * @param Point      $position
+     * @param float|null $meters
+     * @param string     $condition
+     *
+     * @return Builder
+     */
+    public function scopeWithPositionDistance($builder, Point $position, ?float $meters = null, string $condition = '<=')
     {
         return $builder
             ->select()

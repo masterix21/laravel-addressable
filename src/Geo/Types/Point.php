@@ -2,6 +2,9 @@
 
 namespace Masterix21\Addressable\Geo\Types;
 
+use JetBrains\PhpStorm\Internal\TentativeType;
+use Masterix21\Addressable\Geo\Casts\PointCast;
+
 class Point extends Geometry
 {
     public function __construct(
@@ -53,5 +56,15 @@ class Point extends Geometry
     public function __toString(): string
     {
         return $this->latitude .' '. $this->longitude;
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return PointCast::class;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 }

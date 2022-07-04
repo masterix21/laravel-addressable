@@ -3,10 +3,12 @@
 namespace Masterix21\Addressable\Geo\Types;
 
 use GeoIO\WKB\Parser\Parser;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
 use Stringable;
 
-abstract class Geometry implements Arrayable, Stringable
+abstract class Geometry implements Arrayable, Stringable, Castable, JsonSerializable
 {
     protected ?int $srid = null;
 
