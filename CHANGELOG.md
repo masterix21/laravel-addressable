@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.1.0 - 2022-07-04
+- Add ability to use Point columns
+- Query all points between or over another point within X meters
+
 ## 1.0.4 - 2021-04-19
 - Add support to PHP8
 
