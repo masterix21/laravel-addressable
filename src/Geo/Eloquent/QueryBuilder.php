@@ -15,7 +15,10 @@ class QueryBuilder extends \Illuminate\Database\Query\Builder
             }
 
             $geoBindings[] = $binding->getGeoValue();
-            $geoBindings[] = $binding->getSrid();
+
+            if ($binding->hasSrid()) {
+                $geoBindings[] = $binding->getSrid();
+            }
         }
 
         return parent::cleanBindings($geoBindings);
