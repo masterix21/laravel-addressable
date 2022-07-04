@@ -17,4 +17,6 @@ return [
          */
         'addresses' => 'addresses',
     ],
+
+    'srid' => 4326,
 ];

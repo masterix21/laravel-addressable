@@ -31,8 +31,7 @@ class CreateAddressableTable extends Migration
             $table->string('state')->nullable();
             $table->string('country')->nullable();
             $table->string('country_code', 2)->nullable();
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
+            $table->point('position', config('addressable.srid'))->nullable();
 
             $table->timestamps();
         });
