@@ -13,6 +13,7 @@ trait ImplementsQueryScopes
     public function scopeWithPositionDistance(Builder $builder, Point $position, ?float $meters = null, string $condition = '<='): Builder
     {
         return $builder
+            ->select()
             ->addSelect(DB::raw(sprintf('%s as distance', $this->toStDistanceSql($position))))
             ->whereRaw(sprintf('%s %s %d', $this->toStDistanceSql($position), $condition, $meters));
     }

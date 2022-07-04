@@ -72,6 +72,25 @@ $billingAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked
 $billingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `BillingAddressPrimaryUnmarked`
 ```
 
+### Store latitude and longitude for an address
+```php
+$billingAddress->position = new Point(38.90852, 16.5894); 
+$billingAddress->save();
+```
+
+## Query addresses by their distance from/to another point
+```php
+// Take all addresses within 10 km
+$addresses = Address::query()
+  ->withPositionDistance(new Point(38.90852, 16.5894), 10000)
+  ->get();
+
+// Take all addresses over 10 km
+$addresses = Address::query()
+  ->withPositionDistance(new Point(38.90852, 16.5894), 10000, '>=')
+  ->get();
+```
+
 ## Testing
 
 ``` bash
