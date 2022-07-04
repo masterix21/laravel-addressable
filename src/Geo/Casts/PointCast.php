@@ -23,6 +23,14 @@ class PointCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
+        if (is_array($value)) {
+            $value = new Point(
+                $value['latitude'] ?? $value[0],
+                $value['longitude'] ?? $value[1],
+                $value['srid'] ?? $value[2] ?? config('addressable.srid'),
+            );
+        }
+
         if (! $value instanceof Point) {
             throw new InvalidArgumentException('The given value is not a Point instance.');
         }
