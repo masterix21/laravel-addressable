@@ -5,6 +5,7 @@ namespace Masterix21\Addressable\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Masterix21\Addressable\Geo\Eloquent\ImplementsGeoAttributes;
+use Masterix21\Addressable\Geo\Types\Point;
 use Masterix21\Addressable\Models\Concerns\ImplementsMarkPrimary;
 
 class Address extends Model
@@ -38,6 +39,7 @@ class Address extends Model
         'is_primary' => 'bool',
         'is_billing' => 'bool',
         'is_shipping' => 'bool',
+        'position' => Point::class,
     ];
 
     public function getDisplayAddressAttribute() : string

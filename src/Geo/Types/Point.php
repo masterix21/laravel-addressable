@@ -2,7 +2,6 @@
 
 namespace Masterix21\Addressable\Geo\Types;
 
-use JetBrains\PhpStorm\Internal\TentativeType;
 use Masterix21\Addressable\Geo\Casts\PointCast;
 
 class Point extends Geometry
