@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.1.1 - 2022-07-18
+- Add point cast to Address model
+
 ## 1.1.0 - 2022-07-04
 - Add ability to use Point columns
 - Query all points between or over another point within X meters
