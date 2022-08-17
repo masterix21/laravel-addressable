@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.1.2 - 2022-07-18
+- Fix wrong lng/lat paremeters order
+
 ## 1.1.1 - 2022-07-18
 - Add point cast to Address model
 
