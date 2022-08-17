@@ -25,9 +25,9 @@ class PointCast implements CastsAttributes
     {
         if (is_array($value)) {
             $value = new Point(
-                $value['latitude'] ?? $value[0],
-                $value['longitude'] ?? $value[1],
-                $value['srid'] ?? $value[2] ?? config('addressable.srid'),
+                longitude: $value['longitude'] ?? $value[0],
+                latitude: $value['latitude'] ?? $value[1],
+                srid: $value['srid'] ?? $value[2] ?? config('addressable.srid'),
             );
         }
 

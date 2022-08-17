@@ -7,18 +7,11 @@ use Masterix21\Addressable\Geo\Casts\PointCast;
 class Point extends Geometry
 {
     public function __construct(
-        protected ?float $latitude = null,
         protected ?float $longitude = null,
+        protected ?float $latitude = null,
         protected ?int $srid = null
     ) {
         // ...
-    }
-
-    public function setLatitude(?float $value): self
-    {
-        $this->latitude = $value;
-
-        return $this;
     }
 
     public function setLongitude(?float $value): self
@@ -28,14 +21,21 @@ class Point extends Geometry
         return $this;
     }
 
-    public function getLatitude(): ?float
+    public function setLatitude(?float $value): self
     {
-        return $this->latitude;
+        $this->latitude = $value;
+
+        return $this;
     }
 
     public function getLongitude(): ?float
     {
         return $this->longitude;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
     }
 
     public function toWKT(): string
@@ -46,15 +46,15 @@ class Point extends Geometry
     public function toArray(): array
     {
         return [
-            'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'latitude' => $this->latitude,
             'srid' => $this->srid,
         ];
     }
 
     public function __toString(): string
     {
-        return $this->latitude .' '. $this->longitude;
+        return $this->longitude .' '. $this->latitude;
     }
 
     public static function castUsing(array $arguments)
