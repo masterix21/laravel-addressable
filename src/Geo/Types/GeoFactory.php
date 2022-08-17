@@ -8,7 +8,7 @@ class GeoFactory implements Factory
 {
     public function createPoint($dimension, array $coordinates, $srid = null): Point
     {
-        return new Point($coordinates['y'], $coordinates['x'], $srid);
+        return new Point($coordinates['x'], $coordinates['y'], $srid);
     }
 
     public function createLineString($dimension, array $points, $srid = null)
