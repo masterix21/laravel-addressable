@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
-## 1.1.2 - 2022-08-17
+## 1.1.3 - 2022-08-17
 - Fix wrong lng/lat paremeters order
 
 ## 1.1.1 - 2022-07-18
