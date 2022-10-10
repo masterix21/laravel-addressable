@@ -28,6 +28,6 @@ trait ImplementsQueryScopes
 
     protected function toStDistanceSql(Point $position): string
     {
-        return sprintf("ST_Distance(position, ST_GeomFromText('%s', %d))", $position->toWKT(), $position->getSrid());
+        return sprintf("ST_Distance_Sphere(position, ST_GeomFromText('%s', %d))", $position->toWKT(), $position->getSrid());
     }
 }
