@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.1.4 - 2022-10-10
+- Changed ST_Distance with ST_Distance_Sphere
+
 ## 1.1.3 - 2022-08-17
 - Fix wrong lng/lat paremeters order
 
