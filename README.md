@@ -72,6 +72,22 @@ $billingAddress->markPrimary(); // It will emit the events `AddressPrimaryMarked
 $billingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnmarked` and `BillingAddressPrimaryUnmarked`
 ```
 
+### Create a billing address with position
+```php
+$user->billingAddress()->create([
+  'street_address1' => 'Via Antonio Izzi de Falenta, 7/C',
+  'zip' => '88100',
+  'city' => 'Catanzaro',
+  'state' => 'CZ',
+  'country' => 'Italy',
+  'country_code' => 'IT',
+  'position' => [
+    'longitude' => 36.01010,
+    'latitude' => 16.0129
+  ]
+]);
+```
+
 ### Store latitude and longitude for an address
 ```php
 $billingAddress->position = new Point(38.90852, 16.5894); 
