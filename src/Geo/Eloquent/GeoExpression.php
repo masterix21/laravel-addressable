@@ -2,13 +2,14 @@
 
 namespace Masterix21\Addressable\Geo\Eloquent;
 
+use Illuminate\Database\Grammar;
 use Illuminate\Database\Query\Expression;
 use Masterix21\Addressable\Geo\Types\Geometry;
 
 /** @property-read Geometry $value */
 class GeoExpression extends Expression
 {
-    public function getValue()
+    public function getValue(Grammar $grammar)
     {
         if ($this->hasSrid()) {
             return "ST_GeomFromText(?, ?)";
