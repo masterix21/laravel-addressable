@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.2.0 - 2023-02-14
+- Add support to Laravel 10.x
+
 ## 1.1.4 - 2022-10-10
 - Changed ST_Distance with ST_Distance_Sphere
 
