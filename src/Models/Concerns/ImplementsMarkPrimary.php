@@ -14,7 +14,7 @@ trait ImplementsMarkPrimary
 {
     use UsesAddressableConfig;
 
-    public function markPrimary()
+    public function markPrimary(): void
     {
         $this->is_primary = true;
         $this->save();
@@ -37,7 +37,7 @@ trait ImplementsMarkPrimary
         }
     }
 
-    public function unmarkPrimary()
+    public function unmarkPrimary(): void
     {
         $this->is_primary = false;
         $this->save();
