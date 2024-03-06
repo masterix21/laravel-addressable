@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 1.3.0 - 2024-03-06
+- Add support to Laravel 11.x
+- Automatically delete addresses when the addressable is deleted
+
 ## 1.2.0 - 2023-02-14
 - Add support to Laravel 10.x
 
@@ -9,7 +13,7 @@ All notable changes to `laravel-addressable` will be documented in this file
 - Changed ST_Distance with ST_Distance_Sphere
 
 ## 1.1.3 - 2022-08-17
-- Fix wrong lng/lat paremeters order
+- Fix wrong lng/lat parameters order
 
 ## 1.1.1 - 2022-07-18
 - Add point cast to Address model
