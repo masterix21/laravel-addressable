@@ -24,7 +24,7 @@ trait ImplementsMarkPrimary
             ->where('is_billing', $this->is_billing)
             ->where('is_shipping', $this->is_shipment)
             ->where('id', '!=', $this->id)
-            ->update([ 'is_primary' => false ]);
+            ->update(['is_primary' => false]);
 
         event(new AddressPrimaryMarked($this));
 

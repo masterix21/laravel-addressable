@@ -1,7 +1,5 @@
 <?php
 
-namespace Masterix21\Addressable\Tests\Feature\Models;
-
 use Illuminate\Support\Facades\Event;
 use Masterix21\Addressable\Events\AddressPrimaryMarked;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
@@ -13,134 +11,93 @@ use Masterix21\Addressable\Models\Address;
 use Masterix21\Addressable\Tests\TestCase;
 use Masterix21\Addressable\Tests\TestClasses\User;
 
-class AddressTest extends TestCase
-{
-    /** @test */
-    public function it_return_empty_addresses_collection_when_eloquent_has_no_addresses()
-    {
-        $user = factory(User::class, 1)->create()->first();
+uses(TestCase::class);
 
-        $this->assertEmpty($user->addresses);
-    }
+it('return empty addresses collection when eloquent has no addresses', function () {
+    $user = User::factory()->createOne();
 
-    /** @test */
-    public function it_return_addresses_collection_when_eloquent_has_addresses()
-    {
-        $user = factory(User::class, 1)->create()->first();
+    expect($user->addresses)->toBeEmpty();
+});
 
-        factory(Address::class, 1)->create([ 'addressable_id' => $user->id ]);
+it('return addresses collection when eloquent has addresses', function () {
+    $user = User::factory()->createOne();
 
-        $this->assertNotEmpty($user->addresses);
-    }
+    Address::factory()->addressable($user)->createOne();
 
-    /** @test */
-    public function it_fires_AddressPrimaryMarked_event_on_make_primary()
-    {
-        Event::fake();
+    expect($user->addresses)->not->toBeEmpty();
+});
 
-        $user = factory(User::class, 1)->create()->first();
+it('fires address primary marked event on make primary', function () {
+    Event::fake();
 
-        factory(Address::class, 1)
-            ->create([ 'addressable_id' => $user->id ])
-            ->first()
-            ->markPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryMarked::class);
-    }
+    $address = Address::factory()->addressable($user)->createOne();
+    $address->markPrimary();
 
-    /** @test */
-    public function it_fires_AddressPrimaryUnmarked_event_on_make_primary()
-    {
-        Event::fake();
+    Event::assertDispatched(AddressPrimaryMarked::class);
+});
 
-        $user = factory(User::class, 1)->create()->first();
+it('fires address primary unmarked event on make primary', function () {
+    Event::fake();
 
-        factory(Address::class, 1)
-            ->create([
-                'addressable_id' => $user->id,
-                'is_primary' => true,
-            ])
-            ->first()
-            ->unmarkPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryUnmarked::class);
-    }
+    $address = Address::factory()->addressable($user)->primary()->createOne();
 
-    /** @test */
-    public function it_fires_BillingAddressPrimaryMarked_event_on_make_primary()
-    {
-        Event::fake();
+    $address->unmarkPrimary();
 
-        $user = factory(User::class, 1)->create()->first();
+    Event::assertDispatched(AddressPrimaryUnmarked::class);
+});
 
-        factory(Address::class, 1)
-            ->create([
-                'addressable_id' => $user->id,
-                'is_billing' => true,
-            ]);
+it('fires billing address primary marked event on make primary', function () {
+    Event::fake();
 
-        $user->billingAddresses->first()->markPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryMarked::class);
-        Event::assertDispatched(BillingAddressPrimaryMarked::class);
-    }
+    Address::factory()->addressable($user)->billing()->createOne();
 
-    /** @test */
-    public function it_fires_BillingAddressPrimaryUnmarked_event_on_make_primary()
-    {
-        Event::fake();
+    $user->billingAddresses->first()->markPrimary();
 
-        $user = factory(User::class, 1)->create()->first();
+    Event::assertDispatched(AddressPrimaryMarked::class);
+    Event::assertDispatched(BillingAddressPrimaryMarked::class);
+});
 
-        factory(Address::class, 1)
-            ->create([
-                'addressable_id' => $user->id,
-                'is_primary' => true,
-                'is_billing' => true,
-            ]);
+it('fires billing address primary unmarked event on make primary', function () {
+    Event::fake();
 
-        $user->billingAddress->unmarkPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryUnmarked::class);
-        Event::assertDispatched(BillingAddressPrimaryUnmarked::class);
-    }
+    Address::factory()->addressable($user)->primary()->billing()->createOne();
 
-    /** @test */
-    public function it_fires_ShippingAddressPrimaryMarked_event_on_make_primary()
-    {
-        Event::fake();
+    $user->billingAddress->unmarkPrimary();
 
-        $user = factory(User::class, 1)->create()->first();
+    Event::assertDispatched(AddressPrimaryUnmarked::class);
+    Event::assertDispatched(BillingAddressPrimaryUnmarked::class);
+});
 
-        factory(Address::class, 1)
-            ->create([
-                'addressable_id' => $user->id,
-                'is_shipping' => true,
-            ]);
+it('fires shipping address primary marked event on make primary', function () {
+    Event::fake();
 
-        $user->shippingAddresses->first()->markPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryMarked::class);
-        Event::assertDispatched(ShippingAddressPrimaryMarked::class);
-    }
+    Address::factory()->addressable($user)->shipping()->createOne();
 
-    /** @test */
-    public function it_fires_ShippingAddressPrimaryUnmarked_event_on_make_primary()
-    {
-        Event::fake();
+    $user->shippingAddresses->first()->markPrimary();
 
-        $user = factory(User::class, 1)->create()->first();
+    Event::assertDispatched(AddressPrimaryMarked::class);
+    Event::assertDispatched(ShippingAddressPrimaryMarked::class);
+});
 
-        factory(Address::class, 1)
-            ->create([
-                'addressable_id' => $user->id,
-                'is_primary' => true,
-                'is_shipping' => true,
-            ]);
+it('fires shipping address primary unmarked event on make primary', function () {
+    Event::fake();
 
-        $user->shippingAddress->unmarkPrimary();
+    $user = User::factory()->createOne();
 
-        Event::assertDispatched(AddressPrimaryUnmarked::class);
-        Event::assertDispatched(ShippingAddressPrimaryUnmarked::class);
-    }
-}
+    Address::factory()->addressable($user)->primary()->shipping()->createOne();
+
+    $user->shippingAddress->unmarkPrimary();
+
+    Event::assertDispatched(AddressPrimaryUnmarked::class);
+    Event::assertDispatched(ShippingAddressPrimaryUnmarked::class);
+});

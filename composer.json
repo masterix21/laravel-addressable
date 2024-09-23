@@ -17,13 +17,19 @@
     ],
     "require": {
         "php": "^8.1|^8.2|^8.3",
-        "illuminate/support": "^10.0|^11.0",
-        "geo-io/wkb-parser": "^1.0",
-        "jmikola/geojson": "^1.1"
+        "illuminate/contracts": "^11.23"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.23|^7.0|^8.0",
-        "phpunit/phpunit": "^10.0|^11.0"
+        "larastan/larastan": "^2.9",
+        "laravel/pint": "^1.17",
+        "orchestra/testbench": "^9.4",
+        "pestphp/pest": "^3.1",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-drift": "3.x-dev",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^1.2",
+        "phpstan/phpstan-phpunit": "^1.4"
     },
     "autoload": {
         "psr-4": {
@@ -32,15 +38,33 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Masterix21\\Addressable\\Tests\\": "tests"
+            "Masterix21\\Addressable\\Tests\\": "tests",
+            "Masterix21\\Addressable\\Database\\Factories\\": "database/factories"
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "post-autoload-dump": "@composer run prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": [
+            "@composer run prepare",
+            "@php vendor/bin/testbench workbench:build --ansi"
+        ],
+        "start": [
+            "Composer\\Config::disableProcessTimeout",
+            "@composer run build",
+            "@php vendor/bin/testbench serve"
+        ],
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
     },
     "extra": {
         "laravel": {

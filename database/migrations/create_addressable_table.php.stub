@@ -5,16 +5,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
 
-class CreateAddressableTable extends Migration
+return new class extends Migration
 {
     use UsesAddressableConfig;
 
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create($this->addressesDatabaseTable(), function (Blueprint $table) {
             $table->id();
@@ -29,21 +24,15 @@ class CreateAddressableTable extends Migration
             $table->string('zip')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
-            $table->string('country')->nullable();
-            $table->string('country_code', 2)->nullable();
-            $table->point('position', config('addressable.srid'))->nullable();
+            $table->string('country', 4)->nullable();
+            $table->geography('coordinates', 'point')->nullable();
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists($this->addressesDatabaseTable());
     }
-}
+};

@@ -2,16 +2,14 @@
 
 namespace Masterix21\Addressable\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Masterix21\Addressable\Geo\Eloquent\ImplementsGeoAttributes;
-use Masterix21\Addressable\Geo\Types\Point;
 use Masterix21\Addressable\Models\Concerns\ImplementsMarkPrimary;
 
 class Address extends Model
 {
     use HasFactory;
-    use ImplementsGeoAttributes;
     use ImplementsMarkPrimary;
 
     protected $fillable = [
@@ -27,8 +25,7 @@ class Address extends Model
         'city',
         'state',
         'country',
-        'country_code',
-        'position',
+        'coordinates',
     ];
 
     protected $appends = [
@@ -39,10 +36,10 @@ class Address extends Model
         'is_primary' => 'bool',
         'is_billing' => 'bool',
         'is_shipping' => 'bool',
-        'position' => Point::class,
+        'coordinates' => AsArrayObject::class,
     ];
 
-    public function getDisplayAddressAttribute() : string
+    public function getDisplayAddressAttribute(): string
     {
         $keys = [
             'street_address1',
@@ -51,7 +48,6 @@ class Address extends Model
             'city',
             'state',
             'country',
-            'country_code',
         ];
 
         return collect($this->getAttributes())
