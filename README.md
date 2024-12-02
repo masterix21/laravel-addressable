@@ -83,10 +83,7 @@ $user->billingAddress()->create([
   'state' => 'CZ',
   'country' => 'Italy',
   'country_code' => 'IT',
-  'position' => [
-    'longitude' => 36.01010,
-    'latitude' => 16.0129
-  ]
+  'position' => new Point(16.0129, 36.01010)
 ]);
 ```
 
