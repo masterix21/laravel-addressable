@@ -101,3 +101,22 @@ it('fires shipping address primary unmarked event on make primary', function () 
     Event::assertDispatched(AddressPrimaryUnmarked::class);
     Event::assertDispatched(ShippingAddressPrimaryUnmarked::class);
 });
+
+it('stores and retrieves lat/lng correctly', function () {
+    $user = User::factory()->createOne();
+
+    $address = Address::factory()->addressable($user)->primary()->shipping()->createOne();
+
+    expect($address->latitude)->not->toBeNull()
+        ->and($address->longitude)->not->toBeNull();
+
+    $newLat = fake()->latitude();
+    $newLng = fake()->longitude();
+
+    $address
+        ->setCoordinates($newLat, $newLng)
+        ->save();
+
+    expect($address->latitude)->toBe($newLat)
+        ->and($address->longitude)->toBe($newLng);
+});

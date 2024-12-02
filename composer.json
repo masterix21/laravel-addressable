@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8.1|^8.2|^8.3",
+        "php": "^8.2|^8.3|^8.4",
         "illuminate/contracts": "^11.23"
     },
     "require-dev": {
@@ -26,6 +26,7 @@
         "pestphp/pest": "^3.1",
         "pestphp/pest-plugin-arch": "^3.0",
         "pestphp/pest-plugin-drift": "3.x-dev",
+        "pestphp/pest-plugin-faker": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^1.2",

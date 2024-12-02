@@ -2,6 +2,7 @@
 
 namespace Masterix21\Addressable\Database\Factories;
 
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Masterix21\Addressable\Models\Address;
@@ -23,7 +24,7 @@ class AddressFactory extends Factory
             'city' => $this->faker->city,
             'state' => $this->faker->state,
             'country' => $this->faker->countryCode,
-            'coordinates' => [$this->faker->latitude, $this->faker->longitude],
+            'coordinates' => ['lat' => $this->faker->latitude, 'lng' => $this->faker->longitude],
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace Masterix21\Addressable\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Masterix21\Addressable\AddressableServiceProvider;
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -10,6 +11,7 @@ use Orchestra\Testbench\TestCase as Orchestra;
 class TestCase extends Orchestra
 {
     use WithLaravelMigrations;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
