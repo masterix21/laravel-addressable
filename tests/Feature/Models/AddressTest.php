@@ -10,6 +10,7 @@ use Masterix21\Addressable\Events\ShippingAddressPrimaryUnmarked;
 use Masterix21\Addressable\Models\Address;
 use Masterix21\Addressable\Tests\TestCase;
 use Masterix21\Addressable\Tests\TestClasses\User;
+use MatanYadaev\EloquentSpatial\Objects\Point;
 
 uses(TestCase::class);
 
@@ -107,16 +108,56 @@ it('stores and retrieves lat/lng correctly', function () {
 
     $address = Address::factory()->addressable($user)->primary()->shipping()->createOne();
 
-    expect($address->latitude)->not->toBeNull()
-        ->and($address->longitude)->not->toBeNull();
+    expect($address->coordinates->latitude)->not->toBeNull()
+        ->and($address->coordinates->longitude)->not->toBeNull();
 
     $newLat = fake()->latitude();
     $newLng = fake()->longitude();
 
-    $address
-        ->setCoordinates($newLat, $newLng)
-        ->save();
+    $address->coordinates = new Point($newLat, $newLng, config('addressable.srid'));
+    $address->save();
 
-    expect($address->latitude)->toBe($newLat)
-        ->and($address->longitude)->toBe($newLng);
+    expect($address->coordinates->latitude)->toBe($newLat)
+        ->and($address->coordinates->longitude)->toBe($newLng);
+});
+
+it('retrieves all address within 10 km', function () {
+    $user = User::factory()->createOne();
+
+    $homeAddress = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.19, config('addressable.srid'))])
+        ->createOne();
+
+    // Within 10km
+    Address::factory()->addressable($user)->state(['coordinates' => new Point(45.4391, 9.1906, config('addressable.srid'))])->createOne();
+    Address::factory()->addressable($user)->state(['coordinates' => new Point(45.4535, 9.1898, config('addressable.srid'))])->createOne();
+    Address::factory()->addressable($user)->state(['coordinates' => new Point(45.4940, 9.1893, config('addressable.srid'))])->createOne();
+
+    // Within 20km
+    Address::factory()->addressable($user)->state(['coordinates' => new Point(45.5436, 9.4197, config('addressable.srid'))])->createOne();
+    Address::factory()->addressable($user)->state(['coordinates' => new Point(45.6374, 9.2595, config('addressable.srid'))])->createOne();
+
+    $result = Address::query()
+        ->where('id', '!=', $homeAddress->id)
+        ->whereDistanceSphere(
+            column: 'coordinates',
+            geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
+            operator: '<=',
+            value: 10_000
+        )
+        ->count();
+
+    expect($result)->toBe(3);
+
+    $result = Address::query()
+        ->where('id', '!=', $homeAddress->id)
+        ->whereDistanceSphere(
+            column: 'coordinates',
+            geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
+            operator: '>=',
+            value: 10_000
+        )
+        ->count();
+
+    expect($result)->toBe(2);
 });

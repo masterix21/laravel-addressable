@@ -7,6 +7,8 @@
 
 This package adds to any Eloquent model the addresses: in this way will be easier to support a billing address, the shipment addresses or others. 
 
+It uses the great package `matanyadaev/laravel-eloquent-spatial` by Matan Yadaev. 
+
 ## Support us
 
 If you like my work, you can [sponsoring me](https://github.com/masterix21).
@@ -98,13 +100,23 @@ $billingAddress->save();
 ```php
 // Take all addresses within 10 km
 $addresses = Address::query()
-  ->withPositionDistance(new Point(38.90852, 16.5894), 10000)
-  ->get();
+    ->whereDistanceSphere(
+        column: 'coordinates',
+        geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
+        operator: '<=',
+        value: 10_000
+    )
+    ->get();
 
 // Take all addresses over 10 km
 $addresses = Address::query()
-  ->withPositionDistance(new Point(38.90852, 16.5894), 10000, '>=')
-  ->get();
+    ->whereDistanceSphere(
+        column: 'coordinates',
+        geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
+        operator: '>=',
+        value: 10_000
+    )
+    ->get();
 ```
 
 ## Testing
@@ -131,6 +143,7 @@ If you discover any security related issues, please email l.longo@ambita.it inst
 ## Credits
 
 - [Luca Longo](https://github.com/masterix21)
+- [Matan Yadaev](https://github.com/MatanYadaev/laravel-eloquent-spatial)
 - [All Contributors](../../contributors)
 
 ## License

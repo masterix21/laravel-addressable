@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": "^8.2|^8.3|^8.4",
-        "illuminate/contracts": "^11.23"
+        "illuminate/contracts": "^11.23",
+        "matanyadaev/laravel-eloquent-spatial": "^4.4"
     },
     "require-dev": {
         "larastan/larastan": "^2.9",

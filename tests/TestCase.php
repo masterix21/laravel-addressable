@@ -22,6 +22,8 @@ class TestCase extends Orchestra
                 return 'Masterix21\\Addressable\\Database\\Factories\\'.class_basename($modelName).'Factory';
             }
         );
+
+        $this->migrateDb();
     }
 
     protected function getPackageProviders($app): array
@@ -33,14 +35,15 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app): void
     {
-        $app['config']->set('database.default', 'sqlite');
-        $app['config']->set('database.connections.sqlite', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'username' => env('DB_USERNAME', 'root'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'password' => env('DB_PASSWORD'),
+            'database' => env('DB_NAME', 'test'),
         ]);
-
-        $this->migrateDb();
     }
 
     public function migrateDb(): void

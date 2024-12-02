@@ -2,15 +2,18 @@
 
 namespace Masterix21\Addressable\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Masterix21\Addressable\Models\Casts\GeographyCast;
 use Masterix21\Addressable\Models\Concerns\ImplementsMarkPrimary;
+use MatanYadaev\EloquentSpatial\Objects\Point;
+use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 
 class Address extends Model
 {
     use HasFactory;
+    use HasSpatial;
     use ImplementsMarkPrimary;
 
     protected $fillable = [
@@ -37,8 +40,10 @@ class Address extends Model
         'is_primary' => 'bool',
         'is_billing' => 'bool',
         'is_shipping' => 'bool',
-        'coordinates' => GeographyCast::class,
+        'coordinates' => Point::class,
     ];
+
+
 
     public function displayAddress(): Attribute
     {
@@ -57,22 +62,5 @@ class Address extends Model
                 ->values()
                 ->join(' - ');
         });
-    }
-
-    public function latitude(): Attribute
-    {
-        return Attribute::get(fn () => $this->coordinates['lat'] ?? null);
-    }
-
-    public function longitude(): Attribute
-    {
-        return Attribute::get(fn () => $this->coordinates['lng'] ?? null);
-    }
-
-    public function setCoordinates(float $latitude, float $longitude): self
-    {
-        $this->coordinates = compact('latitude', 'longitude');
-
-        return $this;
     }
 }
