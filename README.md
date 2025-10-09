@@ -1,9 +1,9 @@
 # Addresses for any Eloquent model
 
-[![MIT License](https://img.shields.io/github/license/masterix21/laravel-addressable)](https://img.shields.io/github/license/masterix21/laravel-addressable)
-[![Latest Version](https://img.shields.io/github/v/release/masterix21/laravel-addressable)](https://packagist.org/packages/masterix21/laravel-addressable)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/masterix21/laravel-addressable/Tests/master)](https://github.com/masterix21/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster) 
-[![Total Downloads](https://img.shields.io/packagist/dt/masterix21/laravel-addressable.svg)](https://packagist.org/packages/masterix21/laravel-addressable)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/masterix21/laravel-addressable)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/masterix21/laravel-addressable/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/masterix21/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![Total Downloads](https://img.shields.io/packagist/dt/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/masterix21/laravel-addressable)
+
 
 This package adds to any Eloquent model the addresses: in this way will be easier to support a billing address, the shipment addresses or others. 
 
