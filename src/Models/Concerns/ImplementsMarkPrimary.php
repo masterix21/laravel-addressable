@@ -22,7 +22,7 @@ trait ImplementsMarkPrimary
         $this->addressModel()::query()
             ->where('is_primary', true)
             ->where('is_billing', $this->is_billing)
-            ->where('is_shipping', $this->is_shipment)
+            ->where('is_shipping', $this->is_shipping)
             ->where('id', '!=', $this->id)
             ->update(['is_primary' => false]);
 
