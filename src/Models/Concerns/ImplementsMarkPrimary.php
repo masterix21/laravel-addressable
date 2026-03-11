@@ -2,6 +2,7 @@
 
 namespace Masterix21\Addressable\Models\Concerns;
 
+use Illuminate\Support\Facades\DB;
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
 use Masterix21\Addressable\Events\AddressPrimaryMarked;
 use Masterix21\Addressable\Events\AddressPrimaryUnmarked;
@@ -16,15 +17,19 @@ trait ImplementsMarkPrimary
 
     public function markPrimary(): void
     {
-        $this->is_primary = true;
-        $this->save();
+        DB::transaction(function () {
+            $this->is_primary = true;
+            $this->save();
 
-        $this->addressModel()::query()
-            ->where('is_primary', true)
-            ->where('is_billing', $this->is_billing)
-            ->where('is_shipping', $this->is_shipping)
-            ->where('id', '!=', $this->id)
-            ->update(['is_primary' => false]);
+            $this->addressModel()::query()
+                ->where('addressable_type', $this->addressable_type)
+                ->where('addressable_id', $this->addressable_id)
+                ->where('is_primary', true)
+                ->where('is_billing', $this->is_billing)
+                ->where('is_shipping', $this->is_shipping)
+                ->where('id', '!=', $this->id)
+                ->update(['is_primary' => false]);
+        });
 
         event(new AddressPrimaryMarked($this));
 

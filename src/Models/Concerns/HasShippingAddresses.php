@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
+use Masterix21\Addressable\Models\Address;
 
 trait HasShippingAddresses
 {
@@ -13,6 +14,10 @@ trait HasShippingAddresses
 
     public static function bootHasShippingAddresses(): void
     {
+        if (in_array(HasAddresses::class, class_uses_recursive(static::class))) {
+            return;
+        }
+
         static::deleted(function (Model $deletedModel) {
             $deletedModel->shippingAddresses()->delete();
         });
@@ -29,5 +34,10 @@ trait HasShippingAddresses
     {
         return $this->morphMany($this->addressModel(), 'addressable')
             ->where('is_shipping', true);
+    }
+
+    public function addShippingAddress(array $data): Address
+    {
+        return $this->shippingAddresses()->create(array_merge($data, ['is_shipping' => true]));
     }
 }

@@ -18,10 +18,13 @@ class AddressableServiceProvider extends ServiceProvider
                     __DIR__.'/../database/migrations/create_addressable_table.php.stub' => database_path('migrations/'.date('Y_m_d_His', time()).'_create_addressable_table.php'),
                 ], 'migrations');
             }
+
+            $this->publishes([
+                __DIR__.'/../database/migrations/add_meta_to_addressable_table.php.stub' => database_path('migrations/'.date('Y_m_d_His', time()).'_add_meta_to_addressable_table.php'),
+            ], 'addressable-meta-migration');
         }
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'addressable');
-    }
+}
 
     public function register(): void
     {

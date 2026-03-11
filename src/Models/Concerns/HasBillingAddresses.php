@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
+use Masterix21\Addressable\Models\Address;
 
 trait HasBillingAddresses
 {
@@ -13,6 +14,10 @@ trait HasBillingAddresses
 
     public static function bootHasBillingAddresses(): void
     {
+        if (in_array(HasAddresses::class, class_uses_recursive(static::class))) {
+            return;
+        }
+
         static::deleted(function (Model $deletedModel) {
             $deletedModel->billingAddresses()->delete();
         });
@@ -29,5 +34,10 @@ trait HasBillingAddresses
     {
         return $this->morphMany($this->addressModel(), 'addressable')
             ->where('is_billing', true);
+    }
+
+    public function addBillingAddress(array $data): Address
+    {
+        return $this->billingAddresses()->create(array_merge($data, ['is_billing' => true]));
     }
 }

@@ -19,4 +19,11 @@ return [
     ],
 
     'srid' => 4326,
+
+    /**
+     * Format for the display_address accessor.
+     * Use {field_name} placeholders. Set to null to use the default format.
+     * Example: '{street_address1}, {street_address2}, {zip} {city}, {state}, {country}'
+     */
+    'display_format' => null,
 ];
