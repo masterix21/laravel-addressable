@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8.2|^8.3|^8.4",
+        "php": "^8.2",
         "illuminate/contracts": "^11.23|^12.0",
         "matanyadaev/laravel-eloquent-spatial": "^4.5"
     },
@@ -30,8 +30,8 @@
         "pestphp/pest-plugin-faker": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan-deprecation-rules": "^1.2",
-        "phpstan/phpstan-phpunit": "^1.4"
+        "phpstan/phpstan-deprecation-rules": "^1.2|^2.0",
+        "phpstan/phpstan-phpunit": "^1.4|^2.0"
     },
     "autoload": {
         "psr-4": {
