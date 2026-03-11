@@ -11,7 +11,7 @@ It uses the great package `matanyadaev/laravel-eloquent-spatial` by Matan Yadaev
 
 ## Support us
 
-If you like my work, you can [sponsoring me](https://github.com/masterix21).
+If you like my work, you can [sponsor me](https://github.com/masterix21).
 
 ## Installation
 
@@ -43,10 +43,10 @@ class User extends Model {
     use HasAddresses;
 }
 
-$user->shipments(); // morphMany of `Masterix21\Addressable\Models\Address` 
+$user->addresses(); // morphMany of `Masterix21\Addressable\Models\Address`
 ```
 
-`HasAddress` is a generic trait that will implements all addresses code, but if you like to handle the shipments addresses or the billing address there are other two traits.
+`HasAddresses` is a generic trait that implements all addresses code, but if you like to handle the shipping addresses or the billing addresses there are two more specific traits.
 
 ```php
 use Masterix21\Addressable\Models\Concerns\HasBillingAddresses;
@@ -60,8 +60,8 @@ class User extends Model {
 $user->billingAddress(); // Primary billing address
 $user->billingAddresses(); // All billing addresses
 
-$user->shippingAddress(); // Primary shipment address
-$user->shippingAddresses(); // All shipment addresses
+$user->shippingAddress(); // Primary shipping address
+$user->shippingAddresses(); // All shipping addresses
 ```
 
 ### Mark and unmark an address as primary
@@ -76,14 +76,14 @@ $billingAddress->unmarkPrimary(); // It will emit the events `AddressPrimaryUnma
 
 ### Create a billing address with coordinates
 ```php
-$user->billingAddress()->create([
+$user->billingAddresses()->create([
+  'is_billing' => true,
   'street_address1' => 'Via Antonio Izzi de Falenta, 7/C',
   'zip' => '88100',
   'city' => 'Catanzaro',
   'state' => 'CZ',
   'country' => 'Italy',
-  'country_code' => 'IT',
-  'coordinates' => new Point(16.0129, 36.01010)
+  'coordinates' => new Point(38.90852, 16.5894)
 ]);
 ```
 
@@ -121,9 +121,6 @@ $addresses = Address::query()
 ``` bash
 composer test
 ```
-
-## Todo
-- [ ] Method to retrieve all nearby addresses of X kilometers
 
 ## Changelog
 
