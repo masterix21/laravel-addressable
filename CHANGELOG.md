@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 2.2.0 - 2026-03-25
+
+### Added
+- `addDistanceTo` query scope for filtering and ordering models by proximity to a geographic point
+- Distance calculation uses `ST_Distance_Sphere` for accuracy
+- Full test coverage for `addDistanceTo` scope
+
+### Improved
+- README updated with new features, usage examples, and `addDistanceTo` documentation
+- CI workflow: added MySQL service and configured DB connection for spatial tests
+- Resolved CI dependency conflicts and cleaned up `composer.json`
+
 ## 2.1.1 - 2026-03-11
 
 ### Fixed
