@@ -215,6 +215,33 @@ $addresses = Address::query()
     ->get();
 ```
 
+### Add distance as a column
+
+Use `addDistanceTo()` to append the distance from a given point as a column in the result set.
+The value is always in **meters**. Divide by `1000` for kilometers, or by `1609.344` for miles.
+
+```php
+$origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+// Distance in meters (default column name: `distance`)
+$addresses = Address::query()
+    ->addDistanceTo($origin)
+    ->get();
+
+$addresses->first()->distance; // e.g. 1523.4 (meters)
+
+// Custom column name
+$addresses = Address::query()
+    ->addDistanceTo($origin, as: 'dist_meters')
+    ->get();
+
+// Sort by nearest first
+$addresses = Address::query()
+    ->addDistanceTo($origin)
+    ->orderBy('distance')
+    ->get();
+```
+
 ## Testing
 
 ``` bash
