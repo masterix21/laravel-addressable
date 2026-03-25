@@ -73,6 +73,15 @@ class Address extends Model
         return $query->where('is_shipping', true);
     }
 
+    /*
+     * Adds a `distance` column (in meters) to the query using ST_DistanceSphere.
+     * To convert: divide by 1000 for km, by 1609.344 for miles.
+     */
+    public function scopeAddDistanceTo(Builder $query, Point $point, string $as = 'distance'): Builder
+    {
+        return $query->withDistanceSphere('coordinates', $point, $as);
+    }
+
     public function displayAddress(): Attribute
     {
         return Attribute::get(function () {

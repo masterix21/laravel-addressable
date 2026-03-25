@@ -277,6 +277,75 @@ it('stores and retrieves meta', function () {
     expect($address->meta)->toEqual(['phone' => '+39123456789', 'floor' => 3]);
 });
 
+it('adds distance column to query result', function () {
+    $user = User::factory()->createOne();
+
+    // Duomo di Milano
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    // Castello Sforzesco (~1.5 km from the Duomo)
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $addresses = Address::query()
+        ->addDistanceTo($origin)
+        ->get();
+
+    expect($addresses)->each->toHaveKey('distance');
+});
+
+it('returns distance in meters', function () {
+    $user = User::factory()->createOne();
+
+    // Duomo di Milano
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $address = Address::query()->addDistanceTo($origin)->first();
+
+    // Same coordinate as origin: distance must be ~0 meters
+    expect((float) $address->distance)->toBeLessThan(1);
+});
+
+it('returns correct distance between two points in meters', function () {
+    $user = User::factory()->createOne();
+
+    // Castello Sforzesco
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    // Duomo di Milano as origin (~1.5 km from Castello Sforzesco)
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $address = Address::query()->addDistanceTo($origin)->first();
+
+    // Expected distance ~1500m, with tolerance
+    expect((float) $address->distance)->toBeGreaterThan(1000)->toBeLessThan(2000);
+});
+
+it('supports custom alias for distance column', function () {
+    $user = User::factory()->createOne();
+
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $address = Address::query()->addDistanceTo($origin, as: 'dist_meters')->first();
+
+    expect($address)->toHaveKey('dist_meters');
+});
+
 it('uses configurable display format', function () {
     $user = User::factory()->createOne();
 
