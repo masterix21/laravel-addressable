@@ -2,12 +2,17 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
-## Unreleased
+## 2.3.1 - 2026-04-13
 
 ### Added
 - `nearest(Point $origin, ?int $limit = null)` query scope on `Address` that adds the `distance` column, orders ascending and optionally limits the result set — composable with `billing()`, `shipping()`, `primary()`, `withinRadius()`
 - `orderByDistance(Point $origin, string $direction = 'asc')` query scope on `Address`, thin wrapper over the underlying `orderByDistanceSphere` scope
 - Tests covering ascending/descending ordering, limit, `distance` column presence and composition with the `billing()` scope
+
+### Removed
+- Unused `tests/database/migrations/2014_10_12_000000_create_users_table.php` (Testbench's `WithLaravelMigrations` already provides the default users table)
+- Dead commented-out include in `TestCase::migrateDb`
+- `.phpunit.cache/test-results` from version control — `.phpunit.cache` is now gitignored
 
 ## 2.3.0 - 2026-04-13
 
