@@ -2,6 +2,34 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 2.3.0 - 2026-04-13
+
+### Added
+- Laravel 13 support
+- `withinRadius(Point $center, float $meters)` query scope as a clean wrapper over `whereDistanceSphere`
+- Spatial index migration stub (`addressable-spatial-index-migration`) that backfills NULL coordinates to `POINT(0, 0)`, alters `coordinates` to `NOT NULL` with a `POINT(0, 0)` default, and adds a `SPATIAL INDEX` for fast geo queries
+- Eager-loadable `primaryAddress` relation via `User::with('primaryAddress')`
+- Tests for SoftDeletes cascade, non-SoftDeletes cascade, primaryAddress eager loading and `withinRadius`
+
+### Changed
+- `primaryAddress()` is now a `MorphOne` relation instead of a method returning `?Address`. Property access (`$user->primaryAddress`) is unchanged; callers using `$user->primaryAddress()` with parentheses must switch to the property or append `->first()`
+- Cascade delete is now SoftDeletes-aware: addresses survive a soft-delete of the parent model and are removed only on `forceDelete()`
+- `addressable_type` and `addressable_id` removed from `$fillable` on Address to avoid mass-assignment bypassing the polymorphic relation
+- Widen Pest and Pest plugin constraints to `^3.0|^4.0` so the Laravel 13 CI matrix can resolve Pest 4 (`pest-plugin-laravel` v4 is the first version to support Laravel 13)
+
+### Fixed
+- AddressableServiceProvider indentation so `register()` is clearly a class member
+- `scopeAddDistanceTo` PHPDoc block now uses `/** */` instead of `/* */` so IDEs and static analyzers pick it up
+- CI workflow: added missing `--dev` flag on `composer require` so `laravel/framework` and `orchestra/testbench` stay in `require-dev`
+
+### Upgrading from 2.2.x
+- Publish and run the new spatial index migration:
+  ```bash
+  php artisan vendor:publish --provider="Masterix21\\Addressable\\AddressableServiceProvider" --tag="addressable-spatial-index-migration"
+  php artisan migrate
+  ```
+- If you call `$user->primaryAddress()` as a method, switch to the property `$user->primaryAddress` or append `->first()` to the relation builder
+
 ## 2.2.0 - 2026-03-25
 
 ### Added
