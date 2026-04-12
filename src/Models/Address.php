@@ -88,6 +88,29 @@ class Address extends Model
         return $query->whereDistanceSphere('coordinates', $center, '<=', $meters);
     }
 
+    /**
+     * Orders addresses by distance from $origin using ST_DistanceSphere.
+     */
+    public function scopeOrderByDistance(Builder $query, Point $origin, string $direction = 'asc'): Builder
+    {
+        return $query->orderByDistanceSphere('coordinates', $origin, $direction);
+    }
+
+    /**
+     * Fetches the nearest addresses to $origin, with the `distance` column populated.
+     * When $limit is null, ordering is applied without limiting the result set.
+     */
+    public function scopeNearest(Builder $query, Point $origin, ?int $limit = null): Builder
+    {
+        $query->addDistanceTo($origin)->orderByDistance($origin);
+
+        if ($limit !== null) {
+            $query->limit($limit);
+        }
+
+        return $query;
+    }
+
     public function displayAddress(): Attribute
     {
         return Attribute::get(function () {

@@ -381,6 +381,128 @@ it('supports custom alias for distance column', function () {
     expect($address)->toHaveKey('dist_meters');
 });
 
+it('orders addresses by distance ascending via orderByDistance scope', function () {
+    $user = User::factory()->createOne();
+
+    // Bergamo (~45 km from the Duomo)
+    $bergamo = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    // Castello Sforzesco (~1.5 km from the Duomo)
+    $castello = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    // Duomo di Milano
+    $duomo = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $ids = Address::query()->orderByDistance($origin)->pluck('id')->all();
+
+    expect($ids)->toBe([$duomo->id, $castello->id, $bergamo->id]);
+});
+
+it('orders addresses by distance descending via orderByDistance scope', function () {
+    $user = User::factory()->createOne();
+
+    $bergamo = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    $duomo = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $ids = Address::query()->orderByDistance($origin, 'desc')->pluck('id')->all();
+
+    expect($ids)->toBe([$bergamo->id, $duomo->id]);
+});
+
+it('returns nearest addresses with distance column and limit via nearest scope', function () {
+    $user = User::factory()->createOne();
+
+    // Bergamo (~45 km from the Duomo)
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    // Castello Sforzesco (~1.5 km from the Duomo)
+    $castello = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    // Duomo di Milano
+    $duomo = Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $nearest = Address::query()->nearest($origin, 2)->get();
+
+    expect($nearest)->toHaveCount(2)
+        ->and($nearest->pluck('id')->all())->toBe([$duomo->id, $castello->id])
+        ->and($nearest)->each->toHaveKey('distance')
+        ->and((float) $nearest->first()->distance)->toBeLessThan(1)
+        ->and((float) $nearest->last()->distance)->toBeGreaterThan(1000);
+});
+
+it('returns all addresses ordered when nearest is called without a limit', function () {
+    $user = User::factory()->createOne();
+
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $nearest = Address::query()->nearest($origin)->get();
+
+    expect($nearest)->toHaveCount(3);
+});
+
+it('composes nearest scope with billing filter', function () {
+    $user = User::factory()->createOne();
+
+    // Non-billing Duomo — closest but must be excluded
+    Address::factory()->addressable($user)
+        ->state([
+            'is_billing' => false,
+            'coordinates' => new Point(45.4642, 9.1900, config('addressable.srid')),
+        ])
+        ->createOne();
+
+    // Billing Castello Sforzesco (~1.5 km)
+    $castello = Address::factory()->addressable($user)->billing()
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    // Billing Bergamo (~45 km)
+    $bergamo = Address::factory()->addressable($user)->billing()
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    $nearest = Address::query()->billing()->nearest($origin, 5)->get();
+
+    expect($nearest->pluck('id')->all())->toBe([$castello->id, $bergamo->id]);
+});
+
 it('deletes addresses when a non-soft-deletable parent is deleted', function () {
     $user = User::factory()->createOne();
 

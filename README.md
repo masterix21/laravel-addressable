@@ -327,6 +327,28 @@ Address::query()->addDistanceTo($origin, as: 'dist_meters')->get();
 Address::query()->addDistanceTo($origin)->orderBy('distance')->get();
 ```
 
+### Order by distance and find nearest
+
+`orderByDistance()` sorts addresses by distance from a point without adding any column. `nearest()` is the high-level helper for "give me the N closest addresses": it adds the `distance` column, orders ascending and optionally applies a limit.
+
+```php
+$milano = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+// The 5 addresses closest to Milano, each with a populated `distance` (meters)
+$closest = Address::query()->nearest($milano, 5)->get();
+
+$closest->first()->distance; // e.g. 42.1
+
+// Composable with any other scope
+Address::query()->billing()->nearest($milano, 3)->get();
+
+// Without a limit, ordering is applied but the result set is not truncated
+Address::query()->shipping()->nearest($milano)->paginate(20);
+
+// Ordering only, no `distance` column
+Address::query()->orderByDistance($milano, 'desc')->get();
+```
+
 ## Testing
 
 ```bash
