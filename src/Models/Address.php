@@ -20,8 +20,6 @@ class Address extends Model
     use UsesAddressableConfig;
 
     protected $fillable = [
-        'addressable_type',
-        'addressable_id',
         'label',
         'is_primary',
         'is_billing',
@@ -73,13 +71,21 @@ class Address extends Model
         return $query->where('is_shipping', true);
     }
 
-    /*
+    /**
      * Adds a `distance` column (in meters) to the query using ST_DistanceSphere.
      * To convert: divide by 1000 for km, by 1609.344 for miles.
      */
     public function scopeAddDistanceTo(Builder $query, Point $point, string $as = 'distance'): Builder
     {
         return $query->withDistanceSphere('coordinates', $point, $as);
+    }
+
+    /**
+     * Filters addresses whose coordinates are within $meters from $center.
+     */
+    public function scopeWithinRadius(Builder $query, Point $center, float $meters): Builder
+    {
+        return $query->whereDistanceSphere('coordinates', $center, '<=', $meters);
     }
 
     public function displayAddress(): Attribute

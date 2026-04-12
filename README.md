@@ -10,11 +10,12 @@ Attach any number of addresses to any Eloquent model through a polymorphic relat
 
 - Polymorphic `addresses()` relation for any Eloquent model
 - Dedicated `billing` and `shipping` traits with primary-address shortcuts
+- Eager-loadable `primaryAddress`, `billingAddress`, `shippingAddress` relations
 - Primary-address toggling, scoped per address type, with events
-- Geospatial `POINT` column and distance queries (`ST_DistanceSphere`)
+- Geospatial `POINT` column with distance queries, `withinRadius` scope and optional spatial index
 - Free-form `meta` JSON column for extra data
 - Configurable `display_address` accessor
-- Cascade delete of addresses when the parent model is deleted
+- SoftDeletes-aware cascade delete of addresses when the parent model is deleted
 - Pluggable `Address` model and table name
 
 ## Requirements
@@ -56,6 +57,26 @@ Publish and run the additional `meta` column migration:
 php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="addressable-meta-migration"
 php artisan migrate
 ```
+
+### Upgrading from 2.2.x
+
+**Spatial index (optional but recommended).** Publish and run the spatial index migration to make `coordinates` indexed for fast distance queries:
+
+```bash
+php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="addressable-spatial-index-migration"
+php artisan migrate
+```
+
+The migration:
+- Backfills any row with `NULL` coordinates to `POINT(0, 0)` with the configured SRID.
+- Alters `coordinates` to `NOT NULL` with a `POINT(0, 0)` default, so addresses created without explicit coordinates keep working.
+- Adds a `SPATIAL INDEX` on `coordinates`.
+
+**`primaryAddress` is now a relation.** It used to be a method returning `?Address`. It now returns a `MorphOne` relation, which means:
+
+- `$user->primaryAddress` still returns `?Address` (unchanged via property access).
+- `$user->primaryAddress()` now returns a relation builder, **not** the model. If you were calling it as a method, switch to the property or append `->first()`.
+- You can now eager load it: `User::with('primaryAddress')->get()`.
 
 ## Configuration
 
@@ -115,7 +136,7 @@ $user->shippingAddress;   // Primary shipping address (MorphOne)
 $user->shippingAddresses; // All shipping addresses (MorphMany)
 ```
 
-When the parent model is deleted, its addresses are automatically removed.
+When the parent model is hard-deleted, its addresses are automatically removed. If the parent uses `SoftDeletes`, addresses survive soft-delete and are removed only on `forceDelete()`.
 
 ### Create addresses
 
@@ -142,8 +163,9 @@ $user->addShippingAddress([
     'city' => 'Milano',
 ]);
 
-// Fetch the primary address (any type)
-$user->primaryAddress(); // ?Address
+// Fetch the primary address (any type) via the eager-loadable relation
+$user->primaryAddress;                  // ?Address
+User::with('primaryAddress')->get();    // eager loaded
 ```
 
 ### Address fields
@@ -260,13 +282,25 @@ $billingAddress->save();
 
 ### Filter by distance
 
+Use the `withinRadius` scope for the common case of "addresses within N meters of a point":
+
 ```php
+use MatanYadaev\EloquentSpatial\Objects\Point;
+
+$milano = new Point(45.4391, 9.1906, config('addressable.srid'));
+
 // Addresses within 10 km of Milano
-$addresses = Address::query()
+Address::query()->withinRadius($milano, 10_000)->get();
+```
+
+For custom comparisons (`<`, `>=`, etc.) drop down to the underlying spatial scope:
+
+```php
+Address::query()
     ->whereDistanceSphere(
         column: 'coordinates',
-        geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
-        operator: '<=',
+        geometryOrColumn: $milano,
+        operator: '>=',
         value: 10_000,
     )
     ->get();

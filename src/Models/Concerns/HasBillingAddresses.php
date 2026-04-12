@@ -19,6 +19,10 @@ trait HasBillingAddresses
         }
 
         static::deleted(function (Model $deletedModel) {
+            if (method_exists($deletedModel, 'isForceDeleting') && ! $deletedModel->isForceDeleting()) {
+                return;
+            }
+
             $deletedModel->billingAddresses()->delete();
         });
     }

@@ -3,7 +3,9 @@
 namespace Masterix21\Addressable\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Masterix21\Addressable\AddressableServiceProvider;
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -56,5 +58,15 @@ class TestCase extends Orchestra
 
         $migration = include __DIR__.'/../database/migrations/add_meta_to_addressable_table.php.stub';
         $migration->up();
+
+        $migration = include __DIR__.'/../database/migrations/add_spatial_index_to_addressable_table.php.stub';
+        $migration->up();
+
+        Schema::create('soft_users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 }

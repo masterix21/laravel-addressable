@@ -9,6 +9,7 @@ use Masterix21\Addressable\Events\ShippingAddressPrimaryMarked;
 use Masterix21\Addressable\Events\ShippingAddressPrimaryUnmarked;
 use Masterix21\Addressable\Models\Address;
 use Masterix21\Addressable\Tests\TestCase;
+use Masterix21\Addressable\Tests\TestClasses\SoftUser;
 use Masterix21\Addressable\Tests\TestClasses\User;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
@@ -256,11 +257,21 @@ it('adds a shipping address via helper method', function () {
 it('retrieves primary address via helper', function () {
     $user = User::factory()->createOne();
 
-    expect($user->primaryAddress())->toBeNull();
+    expect($user->primaryAddress)->toBeNull();
 
     $address = Address::factory()->addressable($user)->primary()->createOne();
 
-    expect($user->primaryAddress()->id)->toBe($address->id);
+    expect($user->refresh()->primaryAddress->id)->toBe($address->id);
+});
+
+it('eager loads primaryAddress as a relation', function () {
+    $user = User::factory()->createOne();
+    Address::factory()->addressable($user)->primary()->createOne();
+
+    $loaded = User::query()->with('primaryAddress')->whereKey($user->id)->firstOrFail();
+
+    expect($loaded->relationLoaded('primaryAddress'))->toBeTrue()
+        ->and($loaded->primaryAddress)->toBeInstanceOf(Address::class);
 });
 
 it('stores and retrieves meta', function () {
@@ -332,6 +343,30 @@ it('returns correct distance between two points in meters', function () {
     expect((float) $address->distance)->toBeGreaterThan(1000)->toBeLessThan(2000);
 });
 
+it('filters addresses within a radius via withinRadius scope', function () {
+    $user = User::factory()->createOne();
+
+    // Duomo di Milano
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4642, 9.1900, config('addressable.srid'))])
+        ->createOne();
+
+    // Castello Sforzesco (~1.5 km from the Duomo)
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.4704, 9.1796, config('addressable.srid'))])
+        ->createOne();
+
+    // Bergamo (~45 km from the Duomo)
+    Address::factory()->addressable($user)
+        ->state(['coordinates' => new Point(45.6983, 9.6773, config('addressable.srid'))])
+        ->createOne();
+
+    $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
+
+    expect(Address::query()->withinRadius($origin, 2_000)->count())->toBe(2)
+        ->and(Address::query()->withinRadius($origin, 100_000)->count())->toBe(3);
+});
+
 it('supports custom alias for distance column', function () {
     $user = User::factory()->createOne();
 
@@ -344,6 +379,43 @@ it('supports custom alias for distance column', function () {
     $address = Address::query()->addDistanceTo($origin, as: 'dist_meters')->first();
 
     expect($address)->toHaveKey('dist_meters');
+});
+
+it('deletes addresses when a non-soft-deletable parent is deleted', function () {
+    $user = User::factory()->createOne();
+
+    Address::factory()->addressable($user)->createOne();
+    Address::factory()->addressable($user)->billing()->createOne();
+    Address::factory()->addressable($user)->shipping()->createOne();
+
+    $user->delete();
+
+    expect(Address::query()->where('addressable_id', $user->id)->count())->toBe(0);
+});
+
+it('keeps addresses when a soft-deletable parent is soft deleted', function () {
+    $parent = SoftUser::create(['name' => 'soft']);
+
+    Address::factory()->addressable($parent)->createOne();
+    Address::factory()->addressable($parent)->billing()->createOne();
+    Address::factory()->addressable($parent)->shipping()->createOne();
+
+    $parent->delete();
+
+    expect($parent->trashed())->toBeTrue()
+        ->and(Address::query()->where('addressable_id', $parent->id)->count())->toBe(3);
+});
+
+it('deletes addresses when a soft-deletable parent is force deleted', function () {
+    $parent = SoftUser::create(['name' => 'soft']);
+
+    Address::factory()->addressable($parent)->createOne();
+    Address::factory()->addressable($parent)->billing()->createOne();
+    Address::factory()->addressable($parent)->shipping()->createOne();
+
+    $parent->forceDelete();
+
+    expect(Address::query()->where('addressable_id', $parent->id)->count())->toBe(0);
 });
 
 it('uses configurable display format', function () {

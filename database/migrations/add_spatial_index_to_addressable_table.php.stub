@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Masterix21\Addressable\Concerns\UsesAddressableConfig;
+
+return new class extends Migration
+{
+    use UsesAddressableConfig;
+
+    public function up(): void
+    {
+        $tableName = $this->addressesDatabaseTable();
+        $srid = (int) config('addressable.srid');
+
+        DB::table($tableName)
+            ->whereNull('coordinates')
+            ->update(['coordinates' => DB::raw("ST_SRID(POINT(0, 0), {$srid})")]);
+
+        Schema::table($tableName, function (Blueprint $table) use ($srid) {
+            $table->geography('coordinates', 'point', $srid)
+                ->default(DB::raw("(ST_SRID(POINT(0, 0), {$srid}))"))
+                ->change();
+            $table->spatialIndex('coordinates');
+        });
+    }
+};

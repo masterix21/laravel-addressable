@@ -22,9 +22,12 @@ class AddressableServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations/add_meta_to_addressable_table.php.stub' => database_path('migrations/'.date('Y_m_d_His', time()).'_add_meta_to_addressable_table.php'),
             ], 'addressable-meta-migration');
-        }
 
-}
+            $this->publishes([
+                __DIR__.'/../database/migrations/add_spatial_index_to_addressable_table.php.stub' => database_path('migrations/'.date('Y_m_d_His', time()).'_add_spatial_index_to_addressable_table.php'),
+            ], 'addressable-spatial-index-migration');
+        }
+    }
 
     public function register(): void
     {
