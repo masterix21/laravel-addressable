@@ -50,9 +50,6 @@ class TestCase extends Orchestra
 
     public function migrateDb(): void
     {
-        /*$migration = include __DIR__.'/database/migrations/2014_10_12_000000_create_users_table.php';
-        $migration->up();*/
-
         $migration = include __DIR__.'/../database/migrations/create_addressable_table.php.stub';
         $migration->up();
 
