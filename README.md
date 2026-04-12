@@ -4,15 +4,24 @@
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/masterix21/laravel-addressable/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/masterix21/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/masterix21/laravel-addressable)
 
+Attach any number of addresses to any Eloquent model through a polymorphic relation. Built on top of [`matanyadaev/laravel-eloquent-spatial`](https://github.com/MatanYadaev/laravel-eloquent-spatial), it natively supports geospatial coordinates and distance queries — perfect for billing, shipping or any location-aware use case.
 
-This package adds to any Eloquent model the addresses: in this way will be easier to support a billing address, the shipment addresses or others.
+## Features
 
-It uses the great package `matanyadaev/laravel-eloquent-spatial` by Matan Yadaev.
+- Polymorphic `addresses()` relation for any Eloquent model
+- Dedicated `billing` and `shipping` traits with primary-address shortcuts
+- Primary-address toggling, scoped per address type, with events
+- Geospatial `POINT` column and distance queries (`ST_DistanceSphere`)
+- Free-form `meta` JSON column for extra data
+- Configurable `display_address` accessor
+- Cascade delete of addresses when the parent model is deleted
+- Pluggable `Address` model and table name
 
 ## Requirements
 
 - PHP 8.2+
 - Laravel 11.x, 12.x or 13.x (Laravel 13 requires PHP 8.3+)
+- A database with spatial support (MySQL 8+, MariaDB 10.5+, PostgreSQL with PostGIS)
 
 ## Support us
 
@@ -20,130 +29,185 @@ If you like my work, you can [sponsor me](https://github.com/masterix21).
 
 ## Installation
 
-You can install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require masterix21/laravel-addressable
 ```
 
-You can publish and run the migrations with:
+Publish and run the migrations:
 
 ```bash
 php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="migrations"
 php artisan migrate
 ```
 
-You can publish the config file with:
+Optionally publish the config file:
+
 ```bash
 php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="config"
 ```
 
-### Upgrading from 2.1.0
+### Upgrading from 2.1.x
 
-If you're upgrading from a previous version, publish and run the `meta` column migration:
+Publish and run the additional `meta` column migration:
 
 ```bash
 php artisan vendor:publish --provider="Masterix21\Addressable\AddressableServiceProvider" --tag="addressable-meta-migration"
 php artisan migrate
 ```
 
+## Configuration
+
+The published `config/addressable.php` file exposes:
+
+```php
+return [
+    'models' => [
+        // Swap with your own model (e.g. to use UUIDs).
+        'address' => \Masterix21\Addressable\Models\Address::class,
+    ],
+
+    'tables' => [
+        // Change before running the migration.
+        'addresses' => 'addresses',
+    ],
+
+    // SRID used for the POINT column. 4326 = WGS84 (lat/lng).
+    'srid' => 4326,
+
+    // Template for the display_address accessor. Use {field_name} placeholders.
+    // Set to null to fall back to the default " - " separated format.
+    'display_format' => null,
+];
+```
+
 ## Usage
 
-Extends an Eloquent model to supports the addresses is simple.
-``` php
+### Attach addresses to a model
+
+```php
 use Masterix21\Addressable\Models\Concerns\HasAddresses;
 
-class User extends Model {
+class User extends Model
+{
     use HasAddresses;
 }
 
-$user->addresses(); // morphMany of `Masterix21\Addressable\Models\Address`
+$user->addresses; // MorphMany of Masterix21\Addressable\Models\Address
 ```
 
-`HasAddresses` is a generic trait that implements all addresses code, but if you like to handle the shipping addresses or the billing addresses there are two more specific traits.
+`HasAddresses` is the generic trait. For billing or shipping flows, use the dedicated traits (they can be combined):
 
 ```php
 use Masterix21\Addressable\Models\Concerns\HasBillingAddresses;
 use Masterix21\Addressable\Models\Concerns\HasShippingAddresses;
 
-class User extends Model {
-    use HasBillingAddresses,
-        HasShippingAddresses;
+class User extends Model
+{
+    use HasBillingAddresses, HasShippingAddresses;
 }
 
-$user->billingAddress(); // Primary billing address
-$user->billingAddresses(); // All billing addresses
+$user->billingAddress;    // Primary billing address (MorphOne)
+$user->billingAddresses;  // All billing addresses (MorphMany)
 
-$user->shippingAddress(); // Primary shipping address
-$user->shippingAddresses(); // All shipping addresses
+$user->shippingAddress;   // Primary shipping address (MorphOne)
+$user->shippingAddresses; // All shipping addresses (MorphMany)
 ```
 
-### Helper methods
+When the parent model is deleted, its addresses are automatically removed.
 
-Each trait provides convenient helper methods to create addresses:
+### Create addresses
 
 ```php
 // Generic address
-$address = $user->addAddress([
+$user->addAddress([
+    'label' => 'Home',
     'street_address1' => 'Via Roma 1',
+    'zip' => '20100',
     'city' => 'Milano',
+    'state' => 'MI',
     'country' => 'IT',
 ]);
 
-// Billing address (is_billing is set automatically)
-$address = $user->addBillingAddress([
+// Billing address — is_billing is set automatically
+$user->addBillingAddress([
     'street_address1' => 'Via Roma 1',
     'city' => 'Milano',
 ]);
 
-// Shipping address (is_shipping is set automatically)
-$address = $user->addShippingAddress([
+// Shipping address — is_shipping is set automatically
+$user->addShippingAddress([
     'street_address1' => 'Via Roma 1',
     'city' => 'Milano',
 ]);
 
-// Get the primary address
-$primary = $user->primaryAddress(); // ?Address
+// Fetch the primary address (any type)
+$user->primaryAddress(); // ?Address
 ```
 
-### Mark and unmark an address as primary
+### Address fields
 
-To be sure that only one address per type will be "primary", you can use the `markPrimary()` method. It will mark the address as primary and will unmark the others of the same type, scoped to the same parent model.
+| Field             | Type     | Notes                                |
+|-------------------|----------|--------------------------------------|
+| `label`           | string   | Optional tag (e.g. "Home", "Office") |
+| `is_primary`      | bool     | Toggled via `markPrimary()`          |
+| `is_billing`      | bool     | Set automatically by the helper      |
+| `is_shipping`     | bool     | Set automatically by the helper      |
+| `street_address1` | string   |                                      |
+| `street_address2` | string   |                                      |
+| `zip`             | string   |                                      |
+| `city`            | string   |                                      |
+| `state`           | string   |                                      |
+| `country`         | string   | ISO alpha-2/3 (max 4 chars)          |
+| `coordinates`     | `Point`  | Cast to a spatial Point object       |
+| `meta`            | array    | JSON column for arbitrary data       |
+
+### Mark an address as primary
+
+`markPrimary()` ensures a single primary address per type, scoped to the same parent model. It is wrapped in a transaction and unmarks any other primary address of the same kind.
 
 ```php
-$shippingAddress->markPrimary(); // Emits AddressPrimaryMarked and ShippingAddressPrimaryMarked
-$shippingAddress->unmarkPrimary(); // Emits AddressPrimaryUnmarked and ShippingAddressPrimaryUnmarked
+$shippingAddress->markPrimary();
+$shippingAddress->unmarkPrimary();
 
-$billingAddress->markPrimary(); // Emits AddressPrimaryMarked and BillingAddressPrimaryMarked
-$billingAddress->unmarkPrimary(); // Emits AddressPrimaryUnmarked and BillingAddressPrimaryUnmarked
+$billingAddress->markPrimary();
+$billingAddress->unmarkPrimary();
 ```
 
-### Query scopes
+### Events
 
-The `Address` model provides local scopes for fluent queries:
+Every primary toggle dispatches dedicated events (each carrying the `Address` instance):
+
+| Action            | Generic event            | Billing event                   | Shipping event                  |
+|-------------------|--------------------------|---------------------------------|---------------------------------|
+| `markPrimary()`   | `AddressPrimaryMarked`   | `BillingAddressPrimaryMarked`   | `ShippingAddressPrimaryMarked`  |
+| `unmarkPrimary()` | `AddressPrimaryUnmarked` | `BillingAddressPrimaryUnmarked` | `ShippingAddressPrimaryUnmarked`|
+
+All events live in `Masterix21\Addressable\Events`. Billing/shipping variants fire only when the respective flag is set on the address.
+
+### Query scopes
 
 ```php
 use Masterix21\Addressable\Models\Address;
 
-Address::query()->primary()->get();  // All primary addresses
-Address::query()->billing()->get();  // All billing addresses
-Address::query()->shipping()->get(); // All shipping addresses
+Address::query()->primary()->get();
+Address::query()->billing()->get();
+Address::query()->shipping()->get();
 
-// Combine scopes
-Address::query()->billing()->primary()->first(); // Primary billing address
+// Scopes are composable
+Address::query()->billing()->primary()->first();
 ```
 
 ### Inverse relationship
 
-You can access the parent model from an address:
-
 ```php
-$address->addressable; // Returns the parent model (User, Company, etc.)
+$address->addressable; // The parent model (User, Company, ...)
 ```
 
 ### Metadata
 
-Each address supports a `meta` JSON column for storing additional data without schema changes:
+Every address has a JSON `meta` column for extra data without touching the schema:
 
 ```php
 $user->addAddress([
@@ -161,21 +225,25 @@ $address->meta['phone']; // '+39 02 1234567'
 
 ### Display address
 
-The `display_address` accessor formats the address as a readable string:
+The `display_address` accessor returns a readable representation:
 
 ```php
-$address->display_address; // "Via Roma 1 - 20100 - Milano - IT"
+$address->display_address; // "Via Roma 1 - 20100 - Milano - MI - IT"
 ```
 
-You can customize the format in `config/addressable.php`:
+Customize the format in `config/addressable.php`:
 
 ```php
 'display_format' => '{street_address1}, {street_address2}, {zip} {city}, {state}, {country}',
 ```
 
-### Create an address with coordinates
+## Geospatial features
+
+### Store coordinates
 
 ```php
+use MatanYadaev\EloquentSpatial\Objects\Point;
+
 $user->addBillingAddress([
     'street_address1' => 'Via Antonio Izzi de Falenta, 7/C',
     'zip' => '88100',
@@ -184,67 +252,50 @@ $user->addBillingAddress([
     'country' => 'IT',
     'coordinates' => new Point(38.90852, 16.5894, config('addressable.srid')),
 ]);
-```
 
-### Store latitude and longitude for an address
-```php
+// Or assign later
 $billingAddress->coordinates = new Point(38.90852, 16.5894, config('addressable.srid'));
 $billingAddress->save();
 ```
 
-## Query addresses by their distance from/to another point
+### Filter by distance
+
 ```php
-// Take all addresses within 10 km
+// Addresses within 10 km of Milano
 $addresses = Address::query()
     ->whereDistanceSphere(
         column: 'coordinates',
         geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
         operator: '<=',
-        value: 10_000
-    )
-    ->get();
-
-// Take all addresses over 10 km
-$addresses = Address::query()
-    ->whereDistanceSphere(
-        column: 'coordinates',
-        geometryOrColumn: new Point(45.4391, 9.1906, config('addressable.srid')),
-        operator: '>=',
-        value: 10_000
+        value: 10_000,
     )
     ->get();
 ```
 
 ### Add distance as a column
 
-Use `addDistanceTo()` to append the distance from a given point as a column in the result set.
-The value is always in **meters**. Divide by `1000` for kilometers, or by `1609.344` for miles.
+`addDistanceTo()` appends the distance from a given point (always in **meters**) as an extra column. Divide by `1000` for kilometers, by `1609.344` for miles.
 
 ```php
 $origin = new Point(45.4642, 9.1900, config('addressable.srid'));
 
-// Distance in meters (default column name: `distance`)
+// Default column name: `distance`
 $addresses = Address::query()
     ->addDistanceTo($origin)
     ->get();
 
-$addresses->first()->distance; // e.g. 1523.4 (meters)
+$addresses->first()->distance; // e.g. 1523.4
 
 // Custom column name
-$addresses = Address::query()
-    ->addDistanceTo($origin, as: 'dist_meters')
-    ->get();
+Address::query()->addDistanceTo($origin, as: 'dist_meters')->get();
 
-// Sort by nearest first
-$addresses = Address::query()
-    ->addDistanceTo($origin)
-    ->orderBy('distance')
-    ->get();
+// Nearest first
+Address::query()->addDistanceTo($origin)->orderBy('distance')->get();
 ```
 
 ## Testing
 
-``` bash
+```bash
 composer test
 ```
 
