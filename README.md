@@ -1,4 +1,4 @@
-# Addresses for any Eloquent model
+# Make your Eloquent models addressable
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/masterix21/laravel-addressable.svg?style=flat-square)](https://packagist.org/packages/masterix21/laravel-addressable)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/masterix21/laravel-addressable/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/masterix21/laravel-addressable/actions?query=workflow%3Arun-tests+branch%3Amaster)
