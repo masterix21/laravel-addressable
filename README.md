@@ -26,7 +26,7 @@ Attach any number of addresses to any Eloquent model through a polymorphic relat
 
 ## Support us
 
-If you like my work, you can [sponsor me](https://github.com/masterix21).
+If you like my work, you can [sponsor me](https://github.com/sponsors/masterix21).
 
 ## Installation
 
