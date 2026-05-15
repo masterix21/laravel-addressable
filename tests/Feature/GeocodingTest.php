@@ -143,8 +143,7 @@ it('reverse geocodes an address model and fills textual fields', function () {
 });
 
 it('returns false on reverse geocode when coordinates are missing', function () {
-    $user = User::factory()->createOne();
-    $address = Address::factory()->addressable($user)->createOne(['coordinates' => null]);
+    $address = new Address;
 
     expect($address->reverseGeocode())->toBeFalse();
 });
@@ -280,7 +279,6 @@ it('does not auto geocode on save when disabled', function () {
 
     $user = User::factory()->createOne();
     Address::factory()->addressable($user)
-        ->state(['coordinates' => null])
         ->createOne(['street_address1' => 'Via Roma 1', 'city' => 'Milano']);
 
     Http::assertNothingSent();
