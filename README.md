@@ -356,8 +356,33 @@ the opposite. Drivers are tried in order (FIFO): the first one returning a
 result wins, so a failing driver falls back to the next.
 
 Two keyless drivers ship enabled by default: **Nominatim** (OpenStreetMap) and
-**Photon** (Komoot). A **Google** driver is provided too — uncomment its entry
-in `config/addressable.php` and set `GOOGLE_GEOCODER_KEY`.
+**Photon** (Komoot).
+
+### Google driver
+
+A **Google** driver is provided as well. It is commented out in
+`config/addressable.php` — uncomment its entry and set `GOOGLE_GEOCODER_KEY`:
+
+```php
+// config/addressable.php
+'geocoding' => [
+    'drivers' => [
+        'google' => [
+            'class' => \Masterix21\Addressable\Geocoding\Drivers\GoogleGeocoder::class,
+            'endpoint' => 'https://maps.googleapis.com/maps/api/geocode/json',
+            'api_key' => env('GOOGLE_GEOCODER_KEY'),
+        ],
+        'nominatim' => [/* ... */],
+        'photon' => [/* ... */],
+    ],
+],
+```
+
+Drivers are tried in array order, so placing `google` first makes it the
+primary driver with Nominatim and Photon as fallbacks. The Google driver uses
+the Geocoding API for both forward and reverse geocoding, and treats any
+response whose `status` is not `OK` as a miss (falling through to the next
+driver).
 
 ### Geocode an address
 
