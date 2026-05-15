@@ -17,6 +17,8 @@ class TestCase extends Orchestra
 
     protected function setUp(): void
     {
+        $this->ensureTestDatabaseExists();
+
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
@@ -44,8 +46,30 @@ class TestCase extends Orchestra
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'password' => env('DB_PASSWORD'),
-            'database' => env('DB_NAME', 'test'),
+            'database' => $this->testDatabaseName(),
         ]);
+    }
+
+    /*
+     * Each parallel worker gets its own database (suffixed with TEST_TOKEN)
+     * so concurrent runs don't collide on the same schema.
+     */
+    protected function testDatabaseName(): string
+    {
+        $token = env('TEST_TOKEN');
+
+        return env('DB_NAME', 'test').($token ? '_'.$token : '');
+    }
+
+    protected function ensureTestDatabaseExists(): void
+    {
+        $pdo = new \PDO(
+            sprintf('mysql:host=%s;port=%s', env('DB_HOST', '127.0.0.1'), env('DB_PORT', '3306')),
+            env('DB_USERNAME', 'root'),
+            env('DB_PASSWORD') ?? '',
+        );
+
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$this->testDatabaseName()}`");
     }
 
     public function migrateDb(): void

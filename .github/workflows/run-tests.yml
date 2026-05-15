@@ -64,4 +64,4 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: password
           DB_NAME: test
-        run: vendor/bin/pest
+        run: vendor/bin/pest --parallel

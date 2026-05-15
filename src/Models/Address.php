@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Masterix21\Addressable\Concerns\UsesAddressableConfig;
+use Masterix21\Addressable\Events\AddressGeocoded;
+use Masterix21\Addressable\Geocoding\Contracts\Geocoder;
 use Masterix21\Addressable\Models\Concerns\ImplementsMarkPrimary;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
@@ -109,6 +111,49 @@ class Address extends Model
         }
 
         return $query;
+    }
+
+    /*
+     * Resolves `coordinates` from the textual address via the configured geocoder.
+     * Returns false when no driver could geocode the address. Does not persist.
+     */
+    public function geocode(): bool
+    {
+        $point = app(Geocoder::class)->geocode($this->display_address);
+
+        if (! $point) {
+            return false;
+        }
+
+        $this->coordinates = $point;
+
+        event(new AddressGeocoded($this));
+
+        return true;
+    }
+
+    /*
+     * Fills the textual address fields from `coordinates` via the configured geocoder.
+     * Returns false when coordinates are missing or no driver could resolve them.
+     * Does not persist.
+     */
+    public function reverseGeocode(): bool
+    {
+        if (! $this->coordinates) {
+            return false;
+        }
+
+        $fields = app(Geocoder::class)->reverse($this->coordinates);
+
+        if (! $fields) {
+            return false;
+        }
+
+        $this->fill($fields);
+
+        event(new AddressGeocoded($this));
+
+        return true;
     }
 
     public function displayAddress(): Attribute

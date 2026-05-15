@@ -349,6 +349,67 @@ Address::query()->shipping()->nearest($milano)->paginate(20);
 Address::query()->orderByDistance($milano, 'desc')->get();
 ```
 
+## Geocoding
+
+Geocoding turns a textual address into coordinates, and reverse geocoding does
+the opposite. Drivers are tried in order (FIFO): the first one returning a
+result wins, so a failing driver falls back to the next.
+
+Two keyless drivers ship enabled by default: **Nominatim** (OpenStreetMap) and
+**Photon** (Komoot). A **Google** driver is provided too — uncomment its entry
+in `config/addressable.php` and set `GOOGLE_GEOCODER_KEY`.
+
+### Geocode an address
+
+```php
+$address = $user->addAddress([
+    'street_address1' => 'Via Roma 1',
+    'zip' => '20100',
+    'city' => 'Milano',
+    'country' => 'IT',
+]);
+
+if ($address->geocode()) {  // fills `coordinates`, does not persist
+    $address->save();
+}
+```
+
+### Reverse geocode coordinates
+
+```php
+$address->coordinates = new Point(45.4642, 9.19, config('addressable.srid'));
+
+if ($address->reverseGeocode()) {  // fills street/zip/city/state/country
+    $address->save();
+}
+```
+
+Both methods emit the `AddressGeocoded` event on success.
+
+### Automatic geocoding
+
+Set `addressable.geocoding.auto` to `true` (or `ADDRESSABLE_GEOCODER_AUTO=true`)
+to geocode addresses without coordinates automatically on save.
+
+```php
+// With auto enabled, coordinates are resolved on save
+$user->addAddress([
+    'street_address1' => 'Via Roma 1',
+    'city' => 'Milano',
+    'country' => 'IT',
+]);
+```
+
+> **Note:** Nominatim and Photon are free public services with a usage policy
+> (Nominatim limits to ~1 request/second). For high volume, use Google or a
+> self-hosted instance, and throttle bulk geocoding on your side.
+
+### Custom drivers
+
+Implement `Masterix21\Addressable\Geocoding\Contracts\Geocoder` and add it to
+`addressable.geocoding.drivers`. Each driver receives its own config block
+(plus the shared `srid` and `user_agent`).
+
 ## Testing
 
 ```bash
