@@ -2,24 +2,28 @@
 
 namespace Masterix21\Addressable\Observers;
 
+use Masterix21\Addressable\Jobs\GeocodeAddressJob;
 use Masterix21\Addressable\Models\Address;
 
 class AddressObserver
 {
-    public function saving(Address $address): void
+    public function saved(Address $address): void
     {
         if (! config('addressable.geocoding.auto', false)) {
             return;
         }
 
-        if ($address->coordinates !== null) {
+        if (! $this->needsGeocoding($address)) {
             return;
         }
 
-        if (blank($address->display_address)) {
-            return;
-        }
+        $job = config('addressable.geocoding.job', GeocodeAddressJob::class);
 
-        $address->geocode();
+        $job::dispatch($address);
+    }
+
+    protected function needsGeocoding(Address $address): bool
+    {
+        return $address->coordinates === null && filled($address->display_address);
     }
 }

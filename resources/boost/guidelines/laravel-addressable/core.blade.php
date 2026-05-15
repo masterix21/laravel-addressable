@@ -92,8 +92,13 @@ if ($address->geocode()) {
 ```
 
 Drivers are configured in `config/addressable.php` under `geocoding.drivers` and
-tried in FIFO order (first hit wins). Set `geocoding.auto` to `true` to geocode
-addresses without coordinates automatically on save.
+tried in FIFO order (first hit wins).
+
+Enable `geocoding.auto` to geocode addresses saved without coordinates
+automatically. When enabled, the `geocoding.job` is dispatched for each such
+address. The default `GeocodeAddressJob` job runs synchronously; to geocode on a
+queue, extend it with `implements ShouldQueue` and point `geocoding.job` at the
+subclass.
 
 ## Metadata and display
 

@@ -1,9 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Masterix21\Addressable\Events\AddressGeocoded;
 use Masterix21\Addressable\Geocoding\Contracts\Geocoder;
+use Masterix21\Addressable\Jobs\GeocodeAddressJob;
+use Masterix21\Addressable\Tests\TestClasses\QueuedGeocodeAddressJob;
 use Masterix21\Addressable\Models\Address;
 use Masterix21\Addressable\Tests\TestCase;
 use Masterix21\Addressable\Tests\TestClasses\User;
@@ -294,13 +298,66 @@ it('auto geocodes an address on save when enabled', function () {
     ]);
 
     $user = User::factory()->createOne();
-    $address = Address::factory()->addressable($user)
-        ->state(['coordinates' => null])
-        ->createOne([
-            'street_address1' => 'Via Roma 1',
-            'city' => 'Milano',
-            'country' => 'IT',
-        ]);
+    $address = $user->addAddress([
+        'street_address1' => 'Via Roma 1',
+        'city' => 'Milan',
+        'country' => 'IT',
+    ]);
+
+    expect($address->fresh()->coordinates->latitude)->toBe(45.4642);
+});
+
+it('dispatches the configured job on save when auto is enabled', function () {
+    config(['addressable.geocoding.auto' => true]);
+
+    Bus::fake();
+
+    $user = User::factory()->createOne();
+    $user->addAddress(['street_address1' => 'Via Roma 1', 'city' => 'Milan']);
+
+    Bus::assertDispatched(GeocodeAddressJob::class);
+});
+
+it('dispatches a queueable job class when configured', function () {
+    config([
+        'addressable.geocoding.auto' => true,
+        'addressable.geocoding.job' => QueuedGeocodeAddressJob::class,
+    ]);
+
+    Queue::fake();
+
+    $user = User::factory()->createOne();
+    $user->addAddress(['street_address1' => 'Via Roma 1', 'city' => 'Milan']);
+
+    Queue::assertPushed(QueuedGeocodeAddressJob::class);
+});
+
+it('does not dispatch the geocoding job when the address already has coordinates', function () {
+    config(['addressable.geocoding.auto' => true]);
+
+    Bus::fake();
+
+    $user = User::factory()->createOne();
+    Address::factory()->addressable($user)
+        ->createOne(['street_address1' => 'Via Roma 1', 'city' => 'Milan']);
+
+    Bus::assertNotDispatched(GeocodeAddressJob::class);
+});
+
+it('geocodes and persists the address when the GeocodeAddressJob job runs', function () {
+    Http::fake([
+        'nominatim.openstreetmap.org/*' => Http::response([
+            ['lat' => '45.4642', 'lon' => '9.19'],
+        ]),
+    ]);
+
+    $user = User::factory()->createOne();
+    $address = Address::factory()->addressable($user)->createOne([
+        'street_address1' => 'Via Roma 1',
+        'city' => 'Milan',
+    ]);
+
+    (new GeocodeAddressJob($address))->handle();
 
     expect($address->fresh()->coordinates->latitude)->toBe(45.4642);
 });

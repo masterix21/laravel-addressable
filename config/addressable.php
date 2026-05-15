@@ -36,10 +36,17 @@ return [
         'user_agent' => env('ADDRESSABLE_GEOCODER_UA', 'laravel-addressable'),
 
         /**
-         * When true, addresses without coordinates are geocoded automatically
-         * on save. Off by default to avoid unexpected network calls.
+         * When true, addresses saved without coordinates are geocoded
+         * automatically by dispatching the `job` below.
          */
         'auto' => env('ADDRESSABLE_GEOCODER_AUTO', false),
+
+        /**
+         * Job dispatched to geocode an address. The default runs synchronously.
+         * To geocode on a queue, extend it with `implements ShouldQueue` and
+         * point this at your subclass.
+         */
+        'job' => \Masterix21\Addressable\Jobs\GeocodeAddressJob::class,
 
         'drivers' => [
             'nominatim' => [

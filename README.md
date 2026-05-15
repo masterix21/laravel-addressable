@@ -388,8 +388,8 @@ Both methods emit the `AddressGeocoded` event on success.
 
 ### Automatic geocoding
 
-Set `addressable.geocoding.auto` to `true` (or `ADDRESSABLE_GEOCODER_AUTO=true`)
-to geocode addresses without coordinates automatically on save.
+Enable `addressable.geocoding.auto` (or `ADDRESSABLE_GEOCODER_AUTO=true`) to
+geocode addresses saved without coordinates automatically:
 
 ```php
 // With auto enabled, coordinates are resolved on save
@@ -398,6 +398,28 @@ $user->addAddress([
     'city' => 'Milan',
     'country' => 'IT',
 ]);
+```
+
+When enabled, the `addressable.geocoding.job` is dispatched for every address
+saved without coordinates. The default `GeocodeAddressJob` job runs
+**synchronously**. To geocode on a queue instead — recommended for web requests,
+so the geocoder HTTP call doesn't block the response — extend the job and point
+the config at your subclass:
+
+```php
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Masterix21\Addressable\Jobs\GeocodeAddressJob;
+
+class QueuedGeocodeAddressJob extends GeocodeAddressJob implements ShouldQueue
+{
+}
+```
+
+```php
+// config/addressable.php
+'geocoding' => [
+    'job' => \App\Jobs\QueuedGeocodeAddressJob::class,
+],
 ```
 
 > **Note:** Nominatim and Photon are free public services with a usage policy
