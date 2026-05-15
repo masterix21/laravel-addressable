@@ -146,7 +146,7 @@ $user->addAddress([
     'label' => 'Home',
     'street_address1' => 'Via Roma 1',
     'zip' => '20100',
-    'city' => 'Milano',
+    'city' => 'Milan',
     'state' => 'MI',
     'country' => 'IT',
 ]);
@@ -154,13 +154,13 @@ $user->addAddress([
 // Billing address — is_billing is set automatically
 $user->addBillingAddress([
     'street_address1' => 'Via Roma 1',
-    'city' => 'Milano',
+    'city' => 'Milan',
 ]);
 
 // Shipping address — is_shipping is set automatically
 $user->addShippingAddress([
     'street_address1' => 'Via Roma 1',
-    'city' => 'Milano',
+    'city' => 'Milan',
 ]);
 
 // Fetch the primary address (any type) via the eager-loadable relation
@@ -234,7 +234,7 @@ Every address has a JSON `meta` column for extra data without touching the schem
 ```php
 $user->addAddress([
     'street_address1' => 'Via Roma 1',
-    'city' => 'Milano',
+    'city' => 'Milan',
     'meta' => [
         'phone' => '+39 02 1234567',
         'floor' => 3,
@@ -250,7 +250,7 @@ $address->meta['phone']; // '+39 02 1234567'
 The `display_address` accessor returns a readable representation:
 
 ```php
-$address->display_address; // "Via Roma 1 - 20100 - Milano - MI - IT"
+$address->display_address; // "Via Roma 1 - 20100 - Milan - MI - IT"
 ```
 
 Customize the format in `config/addressable.php`:
@@ -289,7 +289,7 @@ use MatanYadaev\EloquentSpatial\Objects\Point;
 
 $milano = new Point(45.4391, 9.1906, config('addressable.srid'));
 
-// Addresses within 10 km of Milano
+// Addresses within 10 km of Milan
 Address::query()->withinRadius($milano, 10_000)->get();
 ```
 
@@ -334,7 +334,7 @@ Address::query()->addDistanceTo($origin)->orderBy('distance')->get();
 ```php
 $milano = new Point(45.4642, 9.1900, config('addressable.srid'));
 
-// The 5 addresses closest to Milano, each with a populated `distance` (meters)
+// The 5 addresses closest to Milan, each with a populated `distance` (meters)
 $closest = Address::query()->nearest($milano, 5)->get();
 
 $closest->first()->distance; // e.g. 42.1
@@ -365,7 +365,7 @@ in `config/addressable.php` and set `GOOGLE_GEOCODER_KEY`.
 $address = $user->addAddress([
     'street_address1' => 'Via Roma 1',
     'zip' => '20100',
-    'city' => 'Milano',
+    'city' => 'Milan',
     'country' => 'IT',
 ]);
 
@@ -395,7 +395,7 @@ to geocode addresses without coordinates automatically on save.
 // With auto enabled, coordinates are resolved on save
 $user->addAddress([
     'street_address1' => 'Via Roma 1',
-    'city' => 'Milano',
+    'city' => 'Milan',
     'country' => 'IT',
 ]);
 ```
