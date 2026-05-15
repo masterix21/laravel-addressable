@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-addressable` will be documented in this file
 
+## 2.4.0 - 2026-05-15
+
+### Added
+- Geocoding: `Address::geocode()` resolves `coordinates` from the textual address, `Address::reverseGeocode()` fills the textual fields from `coordinates`. Neither persists — call `save()` afterwards
+- Driver fallback chain tried in FIFO order (first hit wins). Ships two keyless drivers enabled by default — `NominatimGeocoder` (OpenStreetMap) and `PhotonGeocoder` (Komoot) — plus an optional `GoogleGeocoder`
+- `Geocoder` contract and per-driver config blocks under `addressable.geocoding.drivers` for plugging in custom drivers
+- `AddressGeocoded` event dispatched on a successful `geocode()` / `reverseGeocode()`
+- Automatic geocoding: enable `addressable.geocoding.auto` to geocode addresses saved without coordinates by dispatching `addressable.geocoding.job`
+- `GeocodeAddressJob` — the default job runs synchronously; extend it with `ShouldQueue` and point `geocoding.job` at the subclass to geocode on a queue
+- Laravel Boost guidelines in `resources/boost/guidelines/laravel-addressable/`, so Boost-enabled apps receive package-specific AI instructions
+- `composer test-parallel` script and parallel-safe per-worker test databases; CI now runs the suite in parallel
+
 ## 2.3.1 - 2026-04-13
 
 ### Added
