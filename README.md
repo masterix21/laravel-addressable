@@ -410,11 +410,20 @@ Implement `Masterix21\Addressable\Geocoding\Contracts\Geocoder` and add it to
 `addressable.geocoding.drivers`. Each driver receives its own config block
 (plus the shared `srid` and `user_agent`).
 
+## AI guidelines (Laravel Boost)
+
+This package ships [Laravel Boost](https://github.com/laravel/boost) guidelines.
+If your app uses Boost, run `php artisan boost:install` (or
+`php artisan boost:update --discover`) and select `laravel-addressable` to give
+your AI agent package-specific instructions.
+
 ## Testing
 
 ```bash
 composer test
 ```
+
+Run the suite in parallel with `composer test-parallel`.
 
 ## Changelog
 
