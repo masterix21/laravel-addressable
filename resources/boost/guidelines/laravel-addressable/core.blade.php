@@ -58,16 +58,26 @@ Address::query()->shipping()->get();
 ## Coordinates and distance
 
 Coordinates use `MatanYadaev\EloquentSpatial\Objects\Point`. Always pass the SRID
-from config.
+from config. The `Address` model ships spatial query scopes — prefer them over
+raw `whereDistanceSphere()` calls. Distances are always in **meters**.
 
 ```php
 $address->coordinates = new Point(45.4642, 9.19, config('addressable.srid'));
 
-// Distance in meters as a query column
-Address::query()->addDistanceTo($origin)->orderBy('distance')->get();
-```
+$origin = new Point(45.4642, 9.19, config('addressable.srid'));
 
-For distance filtering use `whereDistanceSphere()` from the spatial package.
+// Append a `distance` column (meters); pass an alias as the second argument
+Address::query()->addDistanceTo($origin)->get();
+
+// Filter addresses within a radius (meters)
+Address::query()->withinRadius($origin, 10_000)->get();
+
+// Order by distance; pass 'desc' as the second argument to reverse
+Address::query()->orderByDistance($origin)->get();
+
+// Nearest addresses: adds the `distance` column, orders ascending, optional limit
+Address::query()->nearest($origin, 5)->get();
+```
 
 ## Geocoding
 
